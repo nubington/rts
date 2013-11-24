@@ -33,6 +33,7 @@ namespace rts
         public bool Visible;
         public bool Revealed;
         public bool HasMoved = true;
+        public bool HasTakenDamage { get; private set; }
         float radius, radiusSquared, diameter;
         int hp, maxHp;
         decimal percentHp;
@@ -59,6 +60,9 @@ namespace rts
 
         public void TakeDamage(Unit attacker, int damage)
         {
+            if (!HasTakenDamage)
+                HasTakenDamage = true;
+
             int actualDamage = (int)MathHelper.Max(damage - armor, 0);
             Hp -= actualDamage;
             if (Hp == 0)

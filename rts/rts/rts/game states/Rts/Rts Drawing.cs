@@ -17,6 +17,33 @@ namespace rts
 {
     public partial class Rts : GameState
     {
+        string fpsMessage = "";
+        static SpriteFont pauseFont, fpsFont, unitInfoUnitNameFont, unitInfoHpFont, unitInfoKillCountFont, resourceCountFont, bigFont;
+
+        static Texture2D greenTeamIndicatorTexture, redTeamIndicatorTexture;
+
+        Form winForm;
+        static Cursor normalCursor, attackCursor;
+
+        static Texture2D buttonTexture;
+
+        //static Texture2D brownGuyTexture, brownGuySelectingTexture, brownGuySelectedTexture;
+        static Texture2D moveCommandShrinkerTexture, attackMoveCommandShrinkerTexture, normalCursorTexture, attackCommandCursorTexture;
+        static Texture2D redCircleTexture, transparentTexture, whiteBoxTexture,
+            transparentGrayTexture, transparentBlackTexture, rallyFlagTexture;
+        static Texture2D cogWheelTexture;
+
+        Texture2D fullMapTexture;
+
+        BaseObject minimapScreenIndicatorBox;
+        PrimitiveLine minimapScreenIndicatorBoxLine;
+
+        Rectangle selectionInfoArea;
+        int selectionInfoAreaPosX, selectionInfoAreaPosY;
+
+        static Texture2D boulder1Texture, tree1Texture;
+
+
         static PrimitiveLine line = new PrimitiveLine(GraphicsDevice, 1);
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -425,7 +452,7 @@ namespace rts
 
             if (waitingForMessage)
             {
-                string str = "Waiting for other player" + "...";
+                string str = "Waiting for other player...";
                 Vector2 strSize = bigFont.MeasureString(str);
                 spriteBatch.DrawString(bigFont, str, new Vector2(uiViewport.Width / 2 - strSize.X / 2, uiViewport.Height / 2 - strSize.Y / 2), Color.White);
             }

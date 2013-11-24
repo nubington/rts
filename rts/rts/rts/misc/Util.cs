@@ -62,7 +62,9 @@ namespace rts
             if (radians >= 0)
                 return radians;
 
-            return (MathHelper.TwoPi - Math.Abs(radians));
+            //return (MathHelper.TwoPi - Math.Abs(radians));
+
+            return MathHelper.TwoPi + radians;
         }
 
         public static float AngleDifference(float a1, float a2)

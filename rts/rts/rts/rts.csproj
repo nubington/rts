@@ -132,8 +132,8 @@
     <Compile Include="Circle.cs" />
     <Compile Include="CommandCard.cs" />
     <Compile Include="game states\HostLobby.cs" />
-    <Compile Include="game states\Rts drawing.cs" />
-    <Compile Include="game states\Rts networking.cs" />
+    <Compile Include="game states\Rts\Rts Drawing.cs" />
+    <Compile Include="game states\Rts\Rts Networking.cs" />
     <Compile Include="game states\StartMenu.cs" />
     <Compile Include="misc\Animation.cs" />
     <Compile Include="base classes\BaseObject.cs" />
@@ -144,7 +144,7 @@
     <Compile Include="misc\Direction.cs" />
     <Compile Include="game states\FpsCounter.cs" />
     <Compile Include="game states\GameState.cs" />
-    <Compile Include="game states\Rts.cs" />
+    <Compile Include="game states\Rts\Rts.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="misc\SimpleButton.cs" />
     <Compile Include="misc\UnitButton.cs" />
@@ -157,7 +157,10 @@
     <Compile Include="game components\SoundEffectManager.cs" />
     <Compile Include="resources\Resource.cs" />
     <Compile Include="projectiles\RtsBullet.cs" />
-    <Compile Include="RtsDraw.cs" />
+    <Compile Include="game states\Rts\Rts Input Processing.cs" />
+    <Compile Include="game states\Rts\Rts Player Actions.cs" />
+    <Compile Include="game states\Rts\Rts UI.cs" />
+    <Compile Include="ScheduledActions.cs" />
     <Compile Include="SelectBox.cs" />
     <Compile Include="Selection.cs" />
     <Compile Include="Shrinker.cs" />

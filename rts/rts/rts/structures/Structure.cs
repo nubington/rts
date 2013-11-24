@@ -245,6 +245,24 @@ namespace rts
             }
         }
 
+        float timeSinceStatusUpdate, statusUpdateDelay = .5f;
+        public void CheckForStatusUpdate(GameTime gameTime, NetPeer netPeer, NetConnection connection)
+        {
+            timeSinceStatusUpdate += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (timeSinceStatusUpdate >= statusUpdateDelay)
+            {
+                timeSinceStatusUpdate = 0f;
+
+                NetOutgoingMessage msg = netPeer.CreateMessage();
+                msg.Write(MessageID.STRUCTURE_STATUS_UPDATE);
+                msg.Write(ID);
+                msg.Write(Team);
+                msg.Write((short)Hp);
+                netPeer.SendMessage(msg, connection, NetDeliveryMethod.ReliableOrdered);
+            }
+        }
+
         int timeSinceConstructionHpTick = 0;
         void updateConstruction(GameTime gameTime)
         {
@@ -273,7 +291,10 @@ namespace rts
             Player.Players[Team].MaxSupply += type.Supply;
             UnderConstruction = false;
             PercentDone = 1f;
-            //Hp = MaxHp;
+
+            if (!HasTakenDamage)
+                Hp = MaxHp;
+
             releaseBuilder();
             ((Rts)Game1.Game.CurrentGameState).CheckForResetCommandCardWhenStructureCompletes(this);
             CogWheel = null;

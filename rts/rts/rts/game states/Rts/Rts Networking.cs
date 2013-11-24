@@ -1,22 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Audio;
-using System.Diagnostics;
-using System.Windows.Forms;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
-using Keys = Microsoft.Xna.Framework.Input.Keys;
 using Lidgren.Network;
 using Lidgren.Network.Xna;
 
 namespace rts
 {
+    public class MessageID
+    {
+        public const byte
+            SYNC = 100,
+            CHECKUP = 101,
+            PATH_UPDATE = 102,
+            UNIT_MOVE_COMMAND_BATCH = 103,
+            STRUCTURE_COMMAND = 104,
+            RALLY_POINT_COMMAND = 105,
+            UNIT_STATUS_UPDATE = 106,
+            UNIT_ATTACK_COMMAND_BATCH = 107,
+            UNIT_ATTACK_MOVE_COMMAND_BATCH = 108,
+            UNIT_BUILD_COMMAND = 109,
+            UNIT_HARVEST_COMMAND_BATCH = 110,
+            UNIT_RETURN_CARGO_COMMAND_BATCH = 111,
+            UNIT_STOP_COMMAND_BATCH = 112,
+            UNIT_HOLD_POSITION_COMMAND_BATCH = 113,
+            UNIT_DEATH = 114,
+            STRUCTURE_DEATH = 115,
+            UNIT_HP_UPDATE = 116,
+            STRUCTURE_STATUS_UPDATE = 117,
+            RESOURCE_STATUS_UPDATE = 118
+            ;
+    }
+
     public partial class Rts : GameState
     {
+        public static Lidgren.Network.NetPeer netPeer;
+        public static Lidgren.Network.NetConnection connection;
+        bool iAmServer;
+
+        float gameClock = 0;
+        float currentScheduleTime;
+        float countDownTime = 4f;
+        bool countingDown = true;
+
+
         float timeSinceLastCheckup, checkupDelay = .5f;
         void checkToCheckup(GameTime gameTime)
         {
@@ -61,6 +87,15 @@ namespace rts
                     unit.CheckForStatusUpdate(gameTime, netPeer, connection);
             }
         }
+
+        void checkForStructureStatusUpdates(GameTime gameTime)
+        {
+            foreach (Structure structure in Structure.Structures)
+            {
+                structure.CheckForStatusUpdate(gameTime, netPeer, connection);
+            }
+        }
+        // resource status updates are handled by the resources themselves
 
         float timeSinceMessageReceived, timeOutDelay = .55f;
         float currentPing;
@@ -169,10 +204,21 @@ namespace rts
                             {
                                 Vector2 expectedPosition = new Vector2(position.X + unit.Speed * currentPing / 2 * (float)Math.Cos(rotation), position.Y + unit.Speed * currentPing / 2 * (float)Math.Sin(rotation));
 
-                                if (Vector2.Distance(expectedPosition, unit.CenterPoint) > unit.Radius / 2)
+                                if (Vector2.Distance(expectedPosition, unit.CenterPoint) > unit.Radius)
                                 {
                                     unit.CenterPoint -= new Vector2((unit.CenterPoint.X - expectedPosition.X), (unit.CenterPoint.Y - expectedPosition.Y));
                                 }
+                            }
+
+                            // read cargoAmount at end if worker
+                            WorkerNublet worker = unit as WorkerNublet;
+                            if (worker != null)
+                            {
+                                short cargoAmount = msg.ReadInt16();
+
+                                worker.CargoAmount = cargoAmount;
+                                if (cargoAmount == 0)
+                                    worker.CargoType = null;
                             }
                         }
                     }
@@ -190,6 +236,31 @@ namespace rts
                                 unit.Die();
                         }
 
+                    }
+                    else if (id == MessageID.STRUCTURE_STATUS_UPDATE)
+                    {
+                        short structureID = msg.ReadInt16();
+                        short team = msg.ReadInt16();
+                        short hp = msg.ReadInt16();
+
+                        Structure structure = Player.Players[team].StructureArray[structureID];
+                        if (structure != null && hp < structure.Hp)
+                        {
+                            structure.Hp = hp;
+                            if (hp <= 0)
+                                structure.Die();
+                        }
+                    }
+                    else if (id == MessageID.RESOURCE_STATUS_UPDATE)
+                    {
+                        short resourceID = msg.ReadInt16();
+                        short amount = msg.ReadInt16();
+
+                        Resource resource = Resource.ResourceArray[resourceID];
+                        if (resource != null && amount > resource.Amount)
+                        {
+                            resource.Amount = amount;
+                        }
                     }
                     /*else if (id == MessageID.PATH_UPDATE)
                     {
@@ -261,7 +332,8 @@ namespace rts
                         short count = msg.ReadInt16();
 
                         RtsObject target;
-                        if (msg.ReadInt16() == 0)
+                        short targetIsStructure = msg.ReadInt16();
+                        if (targetIsStructure == 0)
                         {
                             short targetID = msg.ReadInt16();
                             short targetTeam = msg.ReadInt16();
@@ -415,150 +487,6 @@ namespace rts
             currentPing = connection.AverageRoundtripTime;
             //currentScheduleTime = gameClock + currentPing * .6f;
             currentScheduleTime = gameClock + .1f;
-        }
-    }
-
-    public class MessageID
-    {
-        public const byte
-            SYNC = 100,
-            CHECKUP = 101,
-            PATH_UPDATE = 102,
-            UNIT_MOVE_COMMAND_BATCH = 103, 
-            STRUCTURE_COMMAND = 104,
-            RALLY_POINT_COMMAND = 105,
-            UNIT_STATUS_UPDATE = 106,
-            UNIT_ATTACK_COMMAND_BATCH = 107,
-            UNIT_ATTACK_MOVE_COMMAND_BATCH = 108,
-            UNIT_BUILD_COMMAND = 109,
-            UNIT_HARVEST_COMMAND_BATCH = 110,
-            UNIT_RETURN_CARGO_COMMAND_BATCH = 111,
-            UNIT_STOP_COMMAND_BATCH = 112,
-            UNIT_HOLD_POSITION_COMMAND_BATCH = 113,
-            UNIT_DEATH = 114,
-            STRUCTURE_DEATH = 115,
-            UNIT_HP_UPDATE = 116
-            ;
-    }
-
-    public class DelayedPathUpdate
-    {
-        public static List<DelayedPathUpdate> DelayedPathUpdates = new List<DelayedPathUpdate>();
-
-        public short CommandID;
-        public short Team;
-        public List<Vector2> WayPoints;
-
-        public DelayedPathUpdate(short commandID, short team, List<Vector2> wayPoints)
-        {
-            CommandID = commandID;
-            Team = team;
-            WayPoints = wayPoints;
-
-            DelayedPathUpdates.Add(this);
-        }
-    }
-
-    public abstract class ScheduledAction
-    {
-        public float ScheduledTime { get; private set; }
-        public short Team { get; protected set; }
-
-        public ScheduledAction(float scheduledTime)
-        {
-            ScheduledTime = scheduledTime;
-        }
-    }
-
-    public class ScheduledUnitCommand : ScheduledAction
-    {
-        public UnitCommand UnitCommand { get; private set; }
-        public bool Queued { get; private set; }
-
-        public ScheduledUnitCommand(float scheduledTime, UnitCommand unitCommand, bool queued)
-            : base(scheduledTime)
-        {
-            UnitCommand = unitCommand;
-            Queued = queued;
-            Team = unitCommand.Unit.Team;
-
-            MoveCommand moveCommand = UnitCommand as MoveCommand;
-            if (moveCommand != null)
-            {
-                Unit.PathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
-            }
-        }
-    }
-
-    public class ScheduledReturnCargoCommand : ScheduledUnitCommand
-    {
-        public ReturnCargoCommand ReturnCargoCommand { get; private set; }
-
-        public ScheduledReturnCargoCommand(float scheduledTime, ReturnCargoCommand command)
-            : base(scheduledTime, command, false)
-        {
-            ReturnCargoCommand = command;
-        }
-    }
-
-    public class ScheduledUnitTargetedCommand : ScheduledUnitCommand
-    {
-        public BaseObject Target { get; private set; }
-
-        public ScheduledUnitTargetedCommand(float scheduledTime, UnitCommand unitCommand, BaseObject target, bool queued)
-            : base(scheduledTime, unitCommand, queued)
-        {
-            Target = target;
-        }
-    }
-
-    public class ScheduledUnitBuildCommand : ScheduledUnitCommand
-    {
-        public Point Location { get; private set; }
-        public StructureType Type { get; private set; }
-
-        public ScheduledUnitBuildCommand(float scheduledTime, BuildStructureCommand command, bool queued)
-            : base(scheduledTime, command, queued)
-        {
-            Location = command.StructureLocation;
-            Type = command.StructureType;
-        }
-    }
-
-    public class ScheduledStructureCommand : ScheduledAction
-    {
-        public Structure Structure { get; private set; }
-        public CommandButtonType CommandType;
-        public short ID { get; private set; }
-
-        public ScheduledStructureCommand(float scheduledTime, Structure structure, CommandButtonType commandType)
-            : base(scheduledTime)
-        {
-            Structure = structure;
-            CommandType = commandType;
-        }
-
-        public ScheduledStructureCommand(float scheduledTime, Structure structure, CommandButtonType commandType, short id)
-            : base(scheduledTime)
-        {
-            Structure = structure;
-            CommandType = commandType;
-            ID = id;
-        }
-    }
-
-    public class ScheduledStructureTargetedCommand : ScheduledStructureCommand
-    {
-        public BaseObject Target { get; private set; }
-        public Vector2 Point { get; private set; }
-        public bool Queued { get; private set; }
-
-        public ScheduledStructureTargetedCommand(float scheduledTime, Structure structure, CommandButtonType commandType, BaseObject target, Vector2 point, bool queued)
-            : base(scheduledTime, structure, commandType)
-        {
-            Target = target;
-            Point = point;
-            Queued = queued;
         }
     }
 }

@@ -81,11 +81,11 @@ namespace rts
             WorkerNublet.Hp = 30;
             WorkerNublet.Armor = 0;
             WorkerNublet.SightRange = 5;
-            WorkerNublet.BuildTime = 8000;
+            WorkerNublet.BuildTime = 1000;// 8000;
             WorkerNublet.SelectionSortValue = 100;
             WorkerNublet.TargetPriority = 2;
             WorkerNublet.SupplyCost = 1;
-            WorkerNublet.RoksCost = 8;
+            WorkerNublet.RoksCost = 1;//8;
         }
 
         public Texture2D SelectingTexture, SelectedTexture;

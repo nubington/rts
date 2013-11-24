@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Lidgren.Network;
 
 namespace rts
 {
@@ -73,6 +73,21 @@ namespace rts
             setOccupiedPathNodes();
 
             Resources.Add(this);
+        }
+
+        protected float timeSinceStatusUpdate, statusUpdateDelay = 1f;
+        public void checkForStatusUpdate(NetPeer netPeer, NetConnection connection, int team)
+        {
+            if (team == Player.Me.Team && timeSinceStatusUpdate >= statusUpdateDelay)
+            {
+                timeSinceStatusUpdate = 0f;
+
+                NetOutgoingMessage msg = netPeer.CreateMessage();
+                msg.Write(MessageID.RESOURCE_STATUS_UPDATE);
+                msg.Write(ID);
+                msg.Write((short)Amount);
+                netPeer.SendMessage(msg, connection, NetDeliveryMethod.ReliableOrdered);
+            }
         }
 
         void setOccupiedPathNodes()
@@ -188,6 +203,7 @@ namespace rts
         protected override void Update(GameTime gameTime)
         {
             timeSinceLastEntrance += (int)(gameTime.ElapsedGameTime.TotalMilliseconds * Rts.GameSpeed);
+            timeSinceStatusUpdate += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             for (int i = 0; i < workersInside.Count; )
             {
@@ -330,6 +346,8 @@ namespace rts
                 //worker.QueueCommand(new HarvestCommand(this, 1));
                 worker.ReturnCargoToNearestTownHall(this);
             }
+
+            checkForStatusUpdate(Rts.netPeer, Rts.connection, worker.Team);
         }
 
         protected override void deplete()

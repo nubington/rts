@@ -476,6 +476,14 @@ namespace rts
                     msg.Write(centerPoint.Y);
                     msg.Write(Rotation);
                     msg.Write(IsIdle);
+
+                    // send cargoAmount, 0 if not worker
+                    WorkerNublet worker = this as WorkerNublet;
+                    if (worker != null)
+                        msg.Write(worker.CargoAmount);
+                    else
+                        msg.Write((short)0);
+
                     netPeer.SendMessage(msg, connection, NetDeliveryMethod.ReliableOrdered);
                 }
                 else
