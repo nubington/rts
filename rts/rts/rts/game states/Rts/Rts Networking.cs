@@ -92,7 +92,10 @@ namespace rts
         {
             foreach (Structure structure in Structure.Structures)
             {
-                structure.CheckForStatusUpdate(gameTime, netPeer, connection);
+                // update if not under construction or
+                // under construction and on my team
+                if (!structure.UnderConstruction || structure.Team == Player.Me.Team)
+                    structure.CheckForStatusUpdate(gameTime, netPeer, connection);
             }
         }
         // resource status updates are handled by the resources themselves
@@ -136,7 +139,7 @@ namespace rts
                             {
                                 MoveCommand moveCommand = new MoveCommand(unit, new Vector2(msg.ReadFloat(), msg.ReadFloat()), 1);
                                 Player.Players[team].ScheduledActions.Add(new ScheduledUnitCommand(scheduledTime, moveCommand, queued));
-                                //RtsObject.PathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
+                                //Rts.pathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
                             }
                         }
                     }
@@ -206,7 +209,8 @@ namespace rts
 
                                 if (Vector2.Distance(expectedPosition, unit.CenterPoint) > unit.Radius)
                                 {
-                                    unit.CenterPoint -= new Vector2((unit.CenterPoint.X - expectedPosition.X), (unit.CenterPoint.Y - expectedPosition.Y));
+                                    //unit.CenterPoint -= new Vector2((unit.CenterPoint.X - expectedPosition.X), (unit.CenterPoint.Y - expectedPosition.Y));
+                                    unit.CenterPoint = expectedPosition;
                                 }
                             }
 
@@ -217,8 +221,6 @@ namespace rts
                                 short cargoAmount = msg.ReadInt16();
 
                                 worker.CargoAmount = cargoAmount;
-                                if (cargoAmount == 0)
-                                    worker.CargoType = null;
                             }
                         }
                     }
@@ -244,7 +246,7 @@ namespace rts
                         short hp = msg.ReadInt16();
 
                         Structure structure = Player.Players[team].StructureArray[structureID];
-                        if (structure != null && hp < structure.Hp)
+                        if (structure != null && hp < structure.Hp && structure.HasTakenDamageEver)
                         {
                             structure.Hp = hp;
                             if (hp <= 0)
@@ -257,7 +259,7 @@ namespace rts
                         short amount = msg.ReadInt16();
 
                         Resource resource = Resource.ResourceArray[resourceID];
-                        if (resource != null && amount > resource.Amount)
+                        if (resource != null)// && amount > resource.Amount)
                         {
                             resource.Amount = amount;
                         }
@@ -353,7 +355,7 @@ namespace rts
                             {
                                 AttackCommand attackCommand = new AttackCommand(unit, target, false, false);
                                 Player.Players[target.Team].ScheduledActions.Add(new ScheduledUnitCommand(scheduledTime, attackCommand, queued));
-                                //RtsObject.PathFinder.AddHighPriorityPathFindRequest(attackCommand, (int)Vector2.DistanceSquared(attackCommand.Unit.CenterPoint, attackCommand.Destination), false);
+                                //Rts.pathFinder.AddHighPriorityPathFindRequest(attackCommand, (int)Vector2.DistanceSquared(attackCommand.Unit.CenterPoint, attackCommand.Destination), false);
                             }
                         }
                     }
@@ -372,7 +374,7 @@ namespace rts
                             {
                                 AttackMoveCommand attackMoveCommand = new AttackMoveCommand(unit, new Vector2(msg.ReadFloat(), msg.ReadFloat()), 1);
                                 Player.Players[team].ScheduledActions.Add(new ScheduledUnitCommand(scheduledTime, attackMoveCommand, queued));
-                                //RtsObject.PathFinder.AddHighPriorityPathFindRequest(attackMoveCommand, (int)Vector2.DistanceSquared(attackMoveCommand.Unit.CenterPoint, attackMoveCommand.Destination), false);
+                                //Rts.pathFinder.AddHighPriorityPathFindRequest(attackMoveCommand, (int)Vector2.DistanceSquared(attackMoveCommand.Unit.CenterPoint, attackMoveCommand.Destination), false);
                             }
                         }
                     }
@@ -389,7 +391,7 @@ namespace rts
 
                         BuildStructureCommand buildStructureCommand = new BuildStructureCommand(unit, structureType, location, new Vector2(location.X * map.TileSize + structureType.Size * map.TileSize / 2, location.Y * map.TileSize + structureType.Size * map.TileSize / 2), 1);
                         Player.Players[team].ScheduledActions.Add(new ScheduledUnitBuildCommand(scheduledTime, buildStructureCommand, queued));
-                        RtsObject.PathFinder.AddHighPriorityPathFindRequest(buildStructureCommand, (int)Vector2.DistanceSquared(buildStructureCommand.Unit.CenterPoint, buildStructureCommand.Destination), false);
+                        Rts.pathFinder.AddHighPriorityPathFindRequest(buildStructureCommand, (int)Vector2.DistanceSquared(buildStructureCommand.Unit.CenterPoint, buildStructureCommand.Destination), false);
 
                     }
                     else if (id == MessageID.UNIT_HARVEST_COMMAND_BATCH)

@@ -75,7 +75,7 @@ namespace rts
             {
                 for (int y = placingStructureLocation.Y; y < placingStructureLocation.Y + placingStructureType.Size; y++)
                 {
-                    PathNode node = Structure.PathFinder.PathNodes[(int)MathHelper.Clamp(y, 0, map.Height - 1), (int)MathHelper.Clamp(x, 0, map.Width - 1)];
+                    PathNode node = Rts.pathFinder.PathNodes[(int)MathHelper.Clamp(y, 0, map.Height - 1), (int)MathHelper.Clamp(x, 0, map.Width - 1)];
                     if (collisionCircle.Intersects(node.Tile))
                     {
                         placingStructurePathNodes.Add(node);
@@ -86,17 +86,17 @@ namespace rts
             // remove corners
             if (placingStructureType.CutCorners)
             {
-                placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[placingStructureLocation.Y, placingStructureLocation.X]);
+                placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[placingStructureLocation.Y, placingStructureLocation.X]);
                 if (placingStructureLocation.X + placingStructureType.Size <= map.Width - 1)
-                    placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[placingStructureLocation.Y, placingStructureLocation.X + placingStructureType.Size - 1]);
+                    placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[placingStructureLocation.Y, placingStructureLocation.X + placingStructureType.Size - 1]);
                 else
                     allowPlacingStructure = false;
                 if (placingStructureLocation.Y + placingStructureType.Size <= map.Height - 1)
-                    placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[placingStructureLocation.Y + placingStructureType.Size - 1, placingStructureLocation.X]);
+                    placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[placingStructureLocation.Y + placingStructureType.Size - 1, placingStructureLocation.X]);
                 else
                     allowPlacingStructure = false;
                 if (allowPlacingStructure)
-                    placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[placingStructureLocation.Y + placingStructureType.Size - 1, placingStructureLocation.X + placingStructureType.Size - 1]);
+                    placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[placingStructureLocation.Y + placingStructureType.Size - 1, placingStructureLocation.X + placingStructureType.Size - 1]);
             }
 
             for (int i = 0; i < placingStructurePathNodes.Count; )
@@ -166,7 +166,7 @@ namespace rts
         void createMoveCommandShrinker(Vector2 position, bool attackMove)
         {
             Shrinker moveCommandThing;
-            if (Unit.PathFinder.IsPointWalkable(position))
+            if (Rts.pathFinder.IsPointWalkable(position))
                 moveCommandThing = new Shrinker(position - new Vector2(moveCommandShrinkerSize / 2f, moveCommandShrinkerSize / 2f), moveCommandShrinkerSize, moveCommandShrinkDelay);
             else
                 moveCommandThing = new Shrinker(map.FindNearestWalkableTile(position) - new Vector2(moveCommandShrinkerSize / 2f, moveCommandShrinkerSize / 2f), moveCommandShrinkerSize, moveCommandShrinkDelay);

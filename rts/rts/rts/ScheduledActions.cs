@@ -30,7 +30,8 @@ namespace rts
             MoveCommand moveCommand = UnitCommand as MoveCommand;
             if (moveCommand != null)
             {
-                Unit.PathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
+                // add new command to pathfinding queue
+                Rts.pathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
             }
         }
     }

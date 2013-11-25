@@ -22,8 +22,6 @@ namespace rts
     {
         static List<RtsObject> rtsObjects = new List<RtsObject>();
 
-        public static PathFinder PathFinder;
-
         public List<MapTile> VisibleTiles = new List<MapTile>();
 
         public PathNode CurrentPathNode;
@@ -33,7 +31,9 @@ namespace rts
         public bool Visible;
         public bool Revealed;
         public bool HasMoved = true;
-        public bool HasTakenDamage { get; private set; }
+        public bool HasTakenDamageEver { get; private set; }
+        public bool HpChanged;
+
         float radius, radiusSquared, diameter;
         int hp, maxHp;
         decimal percentHp;
@@ -60,8 +60,8 @@ namespace rts
 
         public void TakeDamage(Unit attacker, int damage)
         {
-            if (!HasTakenDamage)
-                HasTakenDamage = true;
+            if (!HasTakenDamageEver)
+                HasTakenDamageEver = true;
 
             int actualDamage = (int)MathHelper.Max(damage - armor, 0);
             Hp -= actualDamage;
@@ -154,6 +154,7 @@ namespace rts
             {
                 hp = (int)MathHelper.Clamp(value, 0, maxHp);
                 percentHp = hp / (decimal)maxHp;
+                HpChanged = true;
             }
         }
         public int MaxHp

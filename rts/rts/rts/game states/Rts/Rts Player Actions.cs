@@ -83,17 +83,17 @@ namespace rts
                 magicBox.Contains((int)mousePosition.X, (int)mousePosition.Y) ||
                 Vector2.Distance(new Vector2(magicBox.Center.X, magicBox.Center.Y), mousePosition) > magicBoxMaxDistance)
             {
-                //bool isPointWalkable = Unit.PathFinder.IsPointWalkable(mousePosition);
+                //bool isPointWalkable = Rts.pathFinder.IsPointWalkable(mousePosition);
                 // assign move targets to mouse position
                 foreach (Unit unit in units)
                 {
                     // if mouse position is not in a walkable tile, find nearest walkable tile
                     Vector2 destinationPoint;
-                    if (Unit.PathFinder.IsPointWalkable(mousePosition, unit))
+                    if (Rts.pathFinder.IsPointWalkable(mousePosition, unit))
                         destinationPoint = mousePosition;
                     else
                         //destinationPoint = map.FindNearestWalkableTile(mousePosition);
-                        destinationPoint = (Unit.PathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), unit)).Tile.CenterPoint;
+                        destinationPoint = (Rts.pathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), unit)).Tile.CenterPoint;
 
                     createMoveCommandShrinker(destinationPoint, false);
 
@@ -134,9 +134,9 @@ namespace rts
                 {
                     // if mouse position is not in a walkable tile, find nearest walkable tile
                     Vector2 destinationPoint = unit.CenterPoint + new Vector2(distance * angleX, distance * angleY);
-                    if (!Unit.PathFinder.IsPointWalkable(destinationPoint, unit))
+                    if (!Rts.pathFinder.IsPointWalkable(destinationPoint, unit))
                         //destinationPoint = map.FindNearestWalkableTile(destinationPoint);
-                        destinationPoint = (Unit.PathFinder.FindNearestPathNode((int)(destinationPoint.Y / map.TileSize), (int)(destinationPoint.X / map.TileSize), unit)).Tile.CenterPoint;
+                        destinationPoint = (Rts.pathFinder.FindNearestPathNode((int)(destinationPoint.Y / map.TileSize), (int)(destinationPoint.X / map.TileSize), unit)).Tile.CenterPoint;
 
                     createMoveCommandShrinker(destinationPoint, false);
 
@@ -172,7 +172,7 @@ namespace rts
                 MoveCommand moveCommand = s.UnitCommand as MoveCommand;
 
                 Player.Players[s.Team].ScheduledActions.Add(new ScheduledUnitCommand(currentScheduleTime, moveCommand, s.Queued));
-                //Unit.PathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
+                //Rts.pathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
 
                 //if (s.Queued)
                 //moveCommand.Unit.QueueCommand(moveCommand);
@@ -266,7 +266,7 @@ namespace rts
                 AttackCommand attackCommand = s.UnitCommand as AttackCommand;
 
                 Player.Players[s.Team].ScheduledActions.Add(new ScheduledUnitCommand(currentScheduleTime, attackCommand, s.Queued));
-                //Unit.PathFinder.AddHighPriorityPathFindRequest(attackCommand, (int)Vector2.DistanceSquared(attackCommand.Unit.CenterPoint, attackCommand.Destination), false);
+                //Rts.pathFinder.AddHighPriorityPathFindRequest(attackCommand, (int)Vector2.DistanceSquared(attackCommand.Unit.CenterPoint, attackCommand.Destination), false);
 
                 //if (s.Queued)
                 //moveCommand.Unit.QueueCommand(moveCommand);
@@ -352,10 +352,10 @@ namespace rts
 
 
                     Vector2 rallyPoint;
-                    if (Unit.PathFinder.IsPointWalkable(mousePosition))
+                    if (Rts.pathFinder.IsPointWalkable(mousePosition))
                         rallyPoint = mousePosition;
                     else
-                        rallyPoint = Unit.PathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), s).Tile.CenterPoint;
+                        rallyPoint = Rts.pathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), s).Tile.CenterPoint;
 
                     //s.RallyPoints.Add(new RallyPoint(rallyPoint, null));
                     ScheduledStructureTargetedCommand action = new ScheduledStructureTargetedCommand(currentScheduleTime, s, CommandButtonType.RallyPoint, null, rallyPoint, usingShift);
@@ -407,17 +407,17 @@ namespace rts
             if (magicBox.Width > magicBoxMaxSize || magicBox.Height > magicBoxMaxSize ||
                 magicBox.Contains((int)mousePosition.X, (int)mousePosition.Y))
             {
-                //bool isPointWalkable = Unit.PathFinder.IsPointWalkable(mousePosition);
+                //bool isPointWalkable = Rts.pathFinder.IsPointWalkable(mousePosition);
                 // assign move targets to mouse position
                 foreach (Unit unit in units)
                 {
                     // if mouse position is not in a walkable tile, find nearest walkable tile
                     Vector2 destinationPoint;
-                    if (Unit.PathFinder.IsPointWalkable(mousePosition, unit))
+                    if (Rts.pathFinder.IsPointWalkable(mousePosition, unit))
                         destinationPoint = mousePosition;
                     else
                         //destinationPoint = map.FindNearestWalkableTile(mousePosition);\
-                        destinationPoint = (Unit.PathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), unit)).Tile.CenterPoint;
+                        destinationPoint = (Rts.pathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), unit)).Tile.CenterPoint;
 
                     createMoveCommandShrinker(destinationPoint, true);
 
@@ -455,9 +455,9 @@ namespace rts
                 {
                     // if mouse position is not in a walkable tile, find nearest walkable tile
                     Vector2 destinationPoint = unit.CenterPoint + new Vector2(distance * angleX, distance * angleY);
-                    if (!Unit.PathFinder.IsPointWalkable(destinationPoint, unit))
+                    if (!Rts.pathFinder.IsPointWalkable(destinationPoint, unit))
                         //destinationPoint = map.FindNearestWalkableTile(destinationPoint);
-                        destinationPoint = (Unit.PathFinder.FindNearestPathNode((int)(destinationPoint.Y / map.TileSize), (int)(destinationPoint.X / map.TileSize), unit)).Tile.CenterPoint;
+                        destinationPoint = (Rts.pathFinder.FindNearestPathNode((int)(destinationPoint.Y / map.TileSize), (int)(destinationPoint.X / map.TileSize), unit)).Tile.CenterPoint;
 
                     createMoveCommandShrinker(destinationPoint, true);
 
@@ -490,7 +490,7 @@ namespace rts
                 AttackMoveCommand attackMoveCommand = s.UnitCommand as AttackMoveCommand;
 
                 Player.Players[s.Team].ScheduledActions.Add(new ScheduledUnitCommand(currentScheduleTime, attackMoveCommand, s.Queued));
-                //Unit.PathFinder.AddHighPriorityPathFindRequest(attackMoveCommand, (int)Vector2.DistanceSquared(attackMoveCommand.Unit.CenterPoint, attackMoveCommand.Destination), false);
+                //Rts.pathFinder.AddHighPriorityPathFindRequest(attackMoveCommand, (int)Vector2.DistanceSquared(attackMoveCommand.Unit.CenterPoint, attackMoveCommand.Destination), false);
 
                 //if (s.Queued)
                 //moveCommand.Unit.QueueCommand(moveCommand);
@@ -594,7 +594,8 @@ namespace rts
             ScheduledUnitBuildCommand scheduledUnitBuildCommand = new ScheduledUnitBuildCommand(currentScheduleTime, buildStructureCommand, usingShift);
             Player.Players[workerWithSmallestQueue.Team].ScheduledActions.Add(scheduledUnitBuildCommand);
             Player.Players[workerWithSmallestQueue.Team].Roks -= placingStructureType.RoksCost;
-            RtsObject.PathFinder.AddHighPriorityPathFindRequest(buildStructureCommand, (int)Vector2.DistanceSquared(buildStructureCommand.Unit.CenterPoint, buildStructureCommand.Destination), false);
+
+            Rts.pathFinder.AddHighPriorityPathFindRequest(buildStructureCommand, (int)Vector2.DistanceSquared(buildStructureCommand.Unit.CenterPoint, buildStructureCommand.Destination), false);
 
             NetOutgoingMessage msg = netPeer.CreateMessage();
 
@@ -726,10 +727,10 @@ namespace rts
                             else
                             {
                                 Vector2 destinationPoint;
-                                if (Unit.PathFinder.IsPointWalkable(mousePosition, unit))
+                                if (Rts.pathFinder.IsPointWalkable(mousePosition, unit))
                                     destinationPoint = mousePosition;
                                 else
-                                    destinationPoint = (Unit.PathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize),
+                                    destinationPoint = (Rts.pathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize),
                                         (int)(mousePosition.X / map.TileSize), unit)).Tile.CenterPoint;
 
                                 /*if (!usingShift)
@@ -765,7 +766,7 @@ namespace rts
                         {
                             HarvestCommand harvestCommand = s.UnitCommand as HarvestCommand;
                             Player.Players[harvestCommand.Unit.Team].ScheduledActions.Add(new ScheduledUnitTargetedCommand(currentScheduleTime, harvestCommand, harvestCommand.TargetResource, usingShift));
-                            //Unit.PathFinder.AddHighPriorityPathFindRequest(harvestCommand, (int)Vector2.DistanceSquared(harvestCommand.Unit.CenterPoint, harvestCommand.Destination), false);
+                            //Rts.pathFinder.AddHighPriorityPathFindRequest(harvestCommand, (int)Vector2.DistanceSquared(harvestCommand.Unit.CenterPoint, harvestCommand.Destination), false);
 
                             msg.Write(harvestCommand.Unit.ID);
                             msg.Write(harvestCommand.TargetResource.ID);
@@ -789,7 +790,7 @@ namespace rts
                             MoveCommand moveCommand = s.UnitCommand as MoveCommand;
 
                             Player.Players[s.Team].ScheduledActions.Add(new ScheduledUnitCommand(currentScheduleTime, moveCommand, s.Queued));
-                            //Unit.PathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
+                            //Rts.pathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
 
                             //if (s.Queued)
                             //moveCommand.Unit.QueueCommand(moveCommand);
@@ -1053,7 +1054,7 @@ namespace rts
                             AttackCommand command = new AttackCommand(u, o, false, false);
                             u.GiveCommand(command);
                             attacking = true;
-                            //Unit.PathFinder.AddHighPriorityPathFindRequest(u, command, u.CurrentPathNode, (int)Vector2.DistanceSquared(u.CenterPoint, command.Destination), false);
+                            //Rts.pathFinder.AddHighPriorityPathFindRequest(u, command, u.CurrentPathNode, (int)Vector2.DistanceSquared(u.CenterPoint, command.Destination), false);
                         }
                         else
                             u.QueueCommand(new AttackCommand(u, o, false, false));*/

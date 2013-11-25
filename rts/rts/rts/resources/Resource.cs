@@ -34,12 +34,11 @@ namespace rts
     public abstract class Resource : BaseObject
     {
         public static Resource[] ResourceArray = new Resource[1024];
-        public static Map Map;
-        public static PathFinder PathFinder;
 
         public static List<Resource> Resources { get; private set; }
         public ResourceType Type { get; private set; }
         public short ID { get; private set; }
+        public bool AmountChanged;
 
         public List<PathNode> OccupiedPathNodes = new List<PathNode>();
 
@@ -56,7 +55,7 @@ namespace rts
 
         static short idCounter;
         public Resource(ResourceType type, Point location, int size)
-            : base(new Rectangle(location.X * Map.TileSize, location.Y * Map.TileSize, size * Map.TileSize, size * Map.TileSize))
+            : base(new Rectangle(location.X * Rts.map.TileSize, location.Y * Rts.map.TileSize, size * Rts.map.TileSize, size * Rts.map.TileSize))
         {
             ID = idCounter++;
             ResourceArray[ID] = this;
@@ -65,7 +64,7 @@ namespace rts
             Texture = type.NormalTexture;
             Amount = type.AmountOfResources;
             Size = size;
-            Radius = (size * Map.TileSize) / 2f;
+            Radius = (size * Rts.map.TileSize) / 2f;
 
             X = location.X;
             Y = location.Y;
@@ -78,9 +77,10 @@ namespace rts
         protected float timeSinceStatusUpdate, statusUpdateDelay = 1f;
         public void checkForStatusUpdate(NetPeer netPeer, NetConnection connection, int team)
         {
-            if (team == Player.Me.Team && timeSinceStatusUpdate >= statusUpdateDelay)
+            if (AmountChanged && ((team == Player.Me.Team && timeSinceStatusUpdate >= statusUpdateDelay) || Depleted))
             {
                 timeSinceStatusUpdate = 0f;
+                AmountChanged = false;
 
                 NetOutgoingMessage msg = netPeer.CreateMessage();
                 msg.Write(MessageID.RESOURCE_STATUS_UPDATE);
@@ -96,7 +96,7 @@ namespace rts
             {
                 for (int y = Y; y < Y + Size; y++)
                 {
-                    PathNode node = PathFinder.PathNodes[y, x];
+                    PathNode node = Rts.pathFinder.PathNodes[y, x];
                     if (Intersects(node.Tile))
                     {
                         OccupiedPathNodes.Add(node);
@@ -161,6 +161,8 @@ namespace rts
                 amount = (int)MathHelper.Max(value, 0);
                 if (!Depleted && amount == 0)
                     deplete();
+
+                AmountChanged = true;
             }
         }
         public string Name
@@ -223,16 +225,16 @@ namespace rts
         {
             for (int x = X - 1; x <= X + Type.Size; x++)
             {
-                if (x < 0 || x > Map.Width - 1)
+                if (x < 0 || x > Rts.map.Width - 1)
                     continue;
 
                 for (int y = Y - 1; y <= Y + Type.Size; y++)
                 {
-                    if (y < 0 || y > Map.Height - 1)
+                    if (y < 0 || y > Rts.map.Height - 1)
                         continue;
 
-                    if (PathFinder.PathNodes[y, x].Tile.Walkable && !PathFinder.PathNodes[y, x].Blocked)
-                        exitPathNodes.Add(PathFinder.PathNodes[y, x]);
+                    if (Rts.pathFinder.PathNodes[y, x].Tile.Walkable && !Rts.pathFinder.PathNodes[y, x].Blocked)
+                        exitPathNodes.Add(Rts.pathFinder.PathNodes[y, x]);
                 }
             }
 
@@ -297,6 +299,11 @@ namespace rts
             int oldAmount = Amount;
             Amount -= CARGO_PER_TRIP;
             worker.CargoAmount = oldAmount - Amount;
+
+            // only decrement amount if worker is on my team,
+            // else rely on status updates for amount
+            if (worker.Team != Player.Me.Team)
+                Amount = oldAmount;
 
             //int newAmount = (int)(MathHelper.Max(Amount - CARGO_PER_TRIP, 0));
             //worker.CargoAmount = Amount - newAmount;

@@ -12,8 +12,6 @@ namespace rts
         public const int MAX_QUEUE_SIZE = 5;
         const float STARTING_HP_PERCENT = .1f;
 
-        static Map map;
-
         public static List<Structure> structures = new List<Structure>();
         public static List<Structure> DeadStructures = new List<Structure>();
 
@@ -40,7 +38,7 @@ namespace rts
         public short ID;
 
         public Structure(StructureType type, Point tilePosition, short team)
-            : base(new Vector2(tilePosition.X * Map.TileSize, tilePosition.Y * Map.TileSize), type.Size * Map.TileSize, team)
+            : base(new Vector2(tilePosition.X * Rts.map.TileSize, tilePosition.Y * Rts.map.TileSize), type.Size * Rts.map.TileSize, team)
         {
             ID = Player.Players[team].StructureIDCounter++;
             Player.Players[team].StructureArray[ID] = this;
@@ -87,7 +85,7 @@ namespace rts
             //((Rts)Game1.Game.CurrentGameState).CogWheels.Add(new StructureCogWheel(this, (int)(Type.Size * Map.TileSize / 2.5f)));
             //if (team == Player.Me.Team)
             //{
-                CogWheel = new StructureCogWheel(this, (int)(type.Size * Map.TileSize / 2.5f));
+                CogWheel = new StructureCogWheel(this, (int)(type.Size * Rts.map.TileSize / 2.5f));
                 ((Rts)Game1.Game.CurrentGameState).CogWheels.Add(CogWheel);
             //}
 
@@ -111,7 +109,7 @@ namespace rts
             {
                 for (int y = Y; y < Y + size; y++)
                 {
-                    PathNode node = PathFinder.PathNodes[y, x];
+                    PathNode node = Rts.pathFinder.PathNodes[y, x];
                     if (Intersects(node.Tile))
                     {
                         OccupiedPathNodes.Add(node);
@@ -123,22 +121,22 @@ namespace rts
 
             if (type.CutCorners)
             {
-                OccupiedPathNodes.Remove(PathFinder.PathNodes[Y, X]);
-                PathFinder.PathNodes[Y, X].Blocked = false;
-                PathFinder.PathNodes[Y, X].Blocker = null;
-                exitPathNodes.Add(PathFinder.PathNodes[Y, X]);
-                OccupiedPathNodes.Remove(PathFinder.PathNodes[Y, X + size - 1]);
-                PathFinder.PathNodes[Y, X + size - 1].Blocked = false;
-                PathFinder.PathNodes[Y, X + size - 1].Blocker = null;
-                exitPathNodes.Add(PathFinder.PathNodes[Y, X + size - 1]);
-                OccupiedPathNodes.Remove(PathFinder.PathNodes[Y + size - 1, X]);
-                PathFinder.PathNodes[Y + size - 1, X].Blocked = false;
-                PathFinder.PathNodes[Y + size - 1, X].Blocker = null;
-                exitPathNodes.Add(PathFinder.PathNodes[Y + size - 1, X]);
-                OccupiedPathNodes.Remove(PathFinder.PathNodes[Y + size - 1, X + size - 1]);
-                PathFinder.PathNodes[Y + size - 1, X + size - 1].Blocked = false;
-                PathFinder.PathNodes[Y + size - 1, X + size - 1].Blocker = null;
-                exitPathNodes.Add(PathFinder.PathNodes[Y + size - 1, X + size - 1]);
+                OccupiedPathNodes.Remove(Rts.pathFinder.PathNodes[Y, X]);
+                Rts.pathFinder.PathNodes[Y, X].Blocked = false;
+                Rts.pathFinder.PathNodes[Y, X].Blocker = null;
+                exitPathNodes.Add(Rts.pathFinder.PathNodes[Y, X]);
+                OccupiedPathNodes.Remove(Rts.pathFinder.PathNodes[Y, X + size - 1]);
+                Rts.pathFinder.PathNodes[Y, X + size - 1].Blocked = false;
+                Rts.pathFinder.PathNodes[Y, X + size - 1].Blocker = null;
+                exitPathNodes.Add(Rts.pathFinder.PathNodes[Y, X + size - 1]);
+                OccupiedPathNodes.Remove(Rts.pathFinder.PathNodes[Y + size - 1, X]);
+                Rts.pathFinder.PathNodes[Y + size - 1, X].Blocked = false;
+                Rts.pathFinder.PathNodes[Y + size - 1, X].Blocker = null;
+                exitPathNodes.Add(Rts.pathFinder.PathNodes[Y + size - 1, X]);
+                OccupiedPathNodes.Remove(Rts.pathFinder.PathNodes[Y + size - 1, X + size - 1]);
+                Rts.pathFinder.PathNodes[Y + size - 1, X + size - 1].Blocked = false;
+                Rts.pathFinder.PathNodes[Y + size - 1, X + size - 1].Blocker = null;
+                exitPathNodes.Add(Rts.pathFinder.PathNodes[Y + size - 1, X + size - 1]);
             }
         }
 
@@ -146,16 +144,16 @@ namespace rts
         {
             for (int x = X - 1; x <= X + type.Size; x++)
             {
-                if (x < 0 || x > Map.Width - 1)
+                if (x < 0 || x > Rts.map.Width - 1)
                     continue;
 
                 for (int y = Y - 1; y <= Y + type.Size; y++)
                 {
-                    if (y < 0 || y > Map.Height - 1)
+                    if (y < 0 || y > Rts.map.Height - 1)
                         continue;
 
-                    if (PathFinder.PathNodes[y, x].Tile.Walkable && !PathFinder.PathNodes[y, x].Blocked)
-                        exitPathNodes.Add(PathFinder.PathNodes[y, x]);
+                    if (Rts.pathFinder.PathNodes[y, x].Tile.Walkable && !Rts.pathFinder.PathNodes[y, x].Blocked)
+                        exitPathNodes.Add(Rts.pathFinder.PathNodes[y, x]);
                 }
             }
 
@@ -250,9 +248,10 @@ namespace rts
         {
             timeSinceStatusUpdate += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (timeSinceStatusUpdate >= statusUpdateDelay)
+            if (HpChanged && timeSinceStatusUpdate >= statusUpdateDelay)
             {
                 timeSinceStatusUpdate = 0f;
+                HpChanged = false;
 
                 NetOutgoingMessage msg = netPeer.CreateMessage();
                 msg.Write(MessageID.STRUCTURE_STATUS_UPDATE);
@@ -292,7 +291,7 @@ namespace rts
             UnderConstruction = false;
             PercentDone = 1f;
 
-            if (!HasTakenDamage)
+            if (!HasTakenDamageEver)
                 Hp = MaxHp;
 
             releaseBuilder();
@@ -313,17 +312,17 @@ namespace rts
                     angle = Util.ConvertToPositiveRadians(angle);
 
                     if (angle < MathHelper.TwoPi / 4)
-                        Builder.Position = new Vector2(Rectangle.X + Rectangle.Width - map.TileSize / 2, Rectangle.Y + Rectangle.Height - map.TileSize / 2);
+                        Builder.Position = new Vector2(Rectangle.X + Rectangle.Width - Rts.map.TileSize / 2, Rectangle.Y + Rectangle.Height - Rts.map.TileSize / 2);
                     else if (angle < MathHelper.TwoPi / 2)
-                        Builder.Position = new Vector2(Rectangle.X + map.TileSize / 2, Rectangle.Y + Rectangle.Height - map.TileSize / 2);
+                        Builder.Position = new Vector2(Rectangle.X + Rts.map.TileSize / 2, Rectangle.Y + Rectangle.Height - Rts.map.TileSize / 2);
                     else if (angle < MathHelper.TwoPi * .75f)
-                        Builder.Position = new Vector2(Rectangle.X + map.TileSize / 2, Rectangle.Y + map.TileSize / 2);
+                        Builder.Position = new Vector2(Rectangle.X + Rts.map.TileSize / 2, Rectangle.Y + Rts.map.TileSize / 2);
                     else
-                        Builder.Position = new Vector2(Rectangle.X + Rectangle.Width - map.TileSize / 2, Rectangle.Y + map.TileSize / 2);
+                        Builder.Position = new Vector2(Rectangle.X + Rectangle.Width - Rts.map.TileSize / 2, Rectangle.Y + Rts.map.TileSize / 2);
                 }
                 else
                 {
-                    Builder.Position = new Vector2(Rectangle.X + map.TileSize / 2, Rectangle.Y + Rectangle.Height - map.TileSize / 2);
+                    Builder.Position = new Vector2(Rectangle.X + Rts.map.TileSize / 2, Rectangle.Y + Rectangle.Height - Rts.map.TileSize / 2);
                 }
             }
 
@@ -512,11 +511,11 @@ namespace rts
                     else if (exitPathNodes.Count > 0)
                         spawnLocation = exitPathNodes[0].Tile.CenterPoint;
                     else
-                        spawnLocation = new Vector2(Rectangle.X + map.TileSize, Rectangle.Y + Rectangle.Height - map.TileSize / 2);
+                        spawnLocation = new Vector2(Rectangle.X + Rts.map.TileSize, Rectangle.Y + Rectangle.Height - Rts.map.TileSize / 2);
                 }
                 else
                 {
-                    spawnLocation = new Vector2(Rectangle.X + map.TileSize, Rectangle.Y + Rectangle.Height - map.TileSize / 2);
+                    spawnLocation = new Vector2(Rectangle.X + Rts.map.TileSize, Rectangle.Y + Rectangle.Height - Rts.map.TileSize / 2);
                 }
 
                 unit.CenterPoint = new Vector2(spawnLocation.X, spawnLocation.Y);
@@ -540,7 +539,7 @@ namespace rts
                     if (command != null)
                     {
                         unit.GiveCommand(command);
-                        PathFinder.AddHighPriorityPathFindRequest(command, (int)Vector2.DistanceSquared(centerPoint, command.Destination), false);
+                        Rts.pathFinder.AddHighPriorityPathFindRequest(command, (int)Vector2.DistanceSquared(centerPoint, command.Destination), false);
                     }
 
                     for (int i = 1; i < RallyPoints.Count; i++)
@@ -593,18 +592,6 @@ namespace rts
         {
             Die();
             Player.Players[Team].Roks += type.RoksCost;
-        }
-
-        public static Map Map
-        {
-            get
-            {
-                return map;
-            }
-            set
-            {
-                map = value;
-            }
         }
 
         public static List<Structure> Structures

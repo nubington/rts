@@ -510,7 +510,7 @@ namespace rts
                 }
             }*/
         }
-        public void SmoothImmediatePath(List<Vector2> path, Unit unit)
+        public void SmoothImmediatePath(List<Vector2> path, Unit unit, Vector2 beginLocation)
         {
             if (path.Count < 2)
                 return;
@@ -528,7 +528,7 @@ namespace rts
 
             for (int i = 1; i < path.Count; i++)
             {
-                if (Walkable(unit.CenterPoint, path[i], unit, (int)(Vector2.Distance(unit.CenterPoint, path[i]) / unit.Diameter)))
+                if (Walkable(beginLocation, path[i], unit, (int)(Vector2.Distance(beginLocation, path[i]) / unit.Diameter)))
                 {
                     path.RemoveAt(i - 1);
                 }
@@ -1098,7 +1098,7 @@ namespace rts
             {
                 for (int y = location.Y; y < location.Y + size; y++)
                 {
-                    PathNode node = Structure.PathFinder.PathNodes[(int)MathHelper.Clamp(y, 0, Map.Height - 1), (int)MathHelper.Clamp(x, 0, Map.Width - 1)];
+                    PathNode node = Rts.pathFinder.PathNodes[(int)MathHelper.Clamp(y, 0, Map.Height - 1), (int)MathHelper.Clamp(x, 0, Map.Width - 1)];
                     if (collisionCircle.Intersects(node.Tile))
                     {
                         placingStructurePathNodes.Add(node);
@@ -1108,16 +1108,16 @@ namespace rts
             // remove corners
             if (cutCorners)
             {
-                placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[location.Y, location.X]);
+                placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[location.Y, location.X]);
                 if (location.X + size <= Map.Width - 1)
-                    placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[location.Y, location.X + size - 1]);
+                    placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[location.Y, location.X + size - 1]);
                 else
                     return false;
                 if (location.Y + size <= Map.Height - 1)
-                    placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[location.Y + size - 1, location.X]);
+                    placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[location.Y + size - 1, location.X]);
                 else
                     return false;
-                placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[location.Y + size - 1, location.X + size - 1]);
+                placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[location.Y + size - 1, location.X + size - 1]);
             }
 
             foreach (PathNode node in placingStructurePathNodes)
@@ -1138,7 +1138,7 @@ namespace rts
             {
                 for (int y = location.Y; y < location.Y + size; y++)
                 {
-                    PathNode node = Structure.PathFinder.PathNodes[(int)MathHelper.Clamp(y, 0, Map.Height - 1), (int)MathHelper.Clamp(x, 0, Map.Width - 1)];
+                    PathNode node = Rts.pathFinder.PathNodes[(int)MathHelper.Clamp(y, 0, Map.Height - 1), (int)MathHelper.Clamp(x, 0, Map.Width - 1)];
                     if (collisionCircle.Intersects(node.Tile))
                     {
                         placingStructurePathNodes.Add(node);
@@ -1148,16 +1148,16 @@ namespace rts
             // remove corners
             if (cutCorners)
             {
-                placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[location.Y, location.X]);
+                placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[location.Y, location.X]);
                 if (location.X + size <= Map.Width - 1)
-                    placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[location.Y, location.X + size - 1]);
+                    placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[location.Y, location.X + size - 1]);
                 else
                     return false;
                 if (location.Y + size <= Map.Height - 1)
-                    placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[location.Y + size - 1, location.X]);
+                    placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[location.Y + size - 1, location.X]);
                 else
                     return false;
-                placingStructurePathNodes.Remove(Structure.PathFinder.PathNodes[location.Y + size - 1, location.X + size - 1]);
+                placingStructurePathNodes.Remove(Rts.pathFinder.PathNodes[location.Y + size - 1, location.X + size - 1]);
             }
 
             foreach (PathNode node in placingStructurePathNodes)
@@ -1230,7 +1230,7 @@ namespace rts
                 DateTime startTime = DateTime.Now;
 
                 // calculate path
-                request.WayPoints = FindPath(request.Command.Unit.CurrentPathNode, request.Command.Destination, request.Command.Unit, request.Target, request.AvoidUnits);
+                request.WayPoints = FindPath(request.StartNode, request.Command.Destination, request.Command.Unit, request.Target, request.AvoidUnits);
 
                 // smooth path
                 if (!request.AvoidUnits)
@@ -1238,8 +1238,9 @@ namespace rts
                     //if (!(request.Command is AttackCommand))
                     {
                         //if (!(request.Command is AttackCommand))
+
                         SmoothPath(request.WayPoints, request.Command.Unit);
-                        SmoothImmediatePath(request.WayPoints, request.Command.Unit);
+                        SmoothImmediatePath(request.WayPoints, request.Command.Unit, request.StartNode.Tile.CenterPoint);
                     }
                 }
 
@@ -1271,10 +1272,37 @@ namespace rts
                 lowPriorityRequestsToAdd.Enqueue(new PathFindRequest(unit, command, startNode, (int)Vector2.Distance(unit.CenterPoint, command.Destination), avoidUnits));
         }*/
 
+
+        // public method for adding pathfinding requests
+        public void AddPathFindRequest(MoveCommand command, bool queued, bool recalculatingCurrentPath, bool avoidUnits)
+        {
+            int distancePriority;
+
+            if (!queued)
+            {
+                distancePriority = (int)Vector2.DistanceSquared(command.Unit.CenterPoint, command.Destination);
+
+                if (!recalculatingCurrentPath)
+                    addHighPriorityPathFindRequest(command, distancePriority, avoidUnits);
+                else
+                    addLowPriorityPathFindRequest(command, command.Unit.CurrentPathNode, distancePriority, avoidUnits);
+            }
+            else
+            {
+                Vector2 beginLocation = command.Unit.FinalMoveDestination;
+
+                distancePriority = (int)Vector2.DistanceSquared(beginLocation, command.Destination);
+
+                addLowPriorityPathFindRequest(command, PathNodeAt(beginLocation), distancePriority, avoidUnits);
+            }
+        }
+
         // without attack target
-        public void AddHighPriorityPathFindRequest(MoveCommand command, int priority, bool avoidUnits)
+        void addHighPriorityPathFindRequest(MoveCommand command, int priority, bool avoidUnits)
         {
             command.Calculated = false;
+            //highPriorityRequestsToAdd.Enqueue(new PathFindRequest(command, command.Unit.CurrentPathNode, priority, avoidUnits));
+
             highPriorityRequestsToAdd.Enqueue(new PathFindRequest(command, command.Unit.CurrentPathNode, priority, avoidUnits));
         }
         /*// with attack target
@@ -1285,7 +1313,7 @@ namespace rts
         }*/
 
         // without attack target
-        public void AddLowPriorityPathFindRequest(Unit unit, MoveCommand command, PathNode startNode, int priority, bool avoidUnits)
+        void addLowPriorityPathFindRequest(MoveCommand command, PathNode startNode, int priority, bool avoidUnits)
         {
             command.Calculated = false;
             lowPriorityRequestsToAdd.Enqueue(new PathFindRequest(command, startNode, priority, avoidUnits));
@@ -1351,6 +1379,14 @@ namespace rts
                     netPeer.SendMessage(msg, connection, NetDeliveryMethod.ReliableOrdered);*/
                 }
             }
+        }
+
+        public PathNode PathNodeAt(Vector2 location)
+        {
+            int y = (int)MathHelper.Clamp(location.Y / Map.TileSize, 0, Map.Height - 1);
+            int x = (int)MathHelper.Clamp(location.X / Map.TileSize, 0, Map.Width - 1);
+
+            return PathNodes[y, x];
         }
 
         public void SuspendThread()

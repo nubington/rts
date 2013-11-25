@@ -31,7 +31,10 @@ namespace rts
         static Song rtsMusic;
         static SoundEffect errorSoundEffect;
 
-        Map map;
+        // these references to the map and pathfinder are used by everything
+        public static Map map;
+        public static PathFinder pathFinder;
+
         int actualMapWidth, actualMapHeight;
 
         VisionUpdater VisionUpdater;
@@ -50,11 +53,7 @@ namespace rts
 
             //map = new Map(@"Content/map1.muh");
             map = new Map("C:\\rts maps\\map2.muh");
-            Unit.Map = map;
-            Structure.Map = map;
-            Resource.Map = map;
-            RtsObject.PathFinder = new PathFinder(map);
-            Resource.PathFinder = RtsObject.PathFinder;
+            pathFinder = new PathFinder(map);
             map.InstantiateMapResources();
             //Player.Me.Team = myTeam;
             Player.Me = Player.Players[myTeam];
@@ -64,7 +63,7 @@ namespace rts
 
             Unit.UnitCollisionSweeper.Thread.Suspend();
             Unit.UnitCollisionSweeper.Thread.Resume();
-            RtsObject.PathFinder.ResumeThread();
+            Rts.pathFinder.ResumeThread();
 
             uiViewport = GraphicsDevice.Viewport;
             worldViewport = GraphicsDevice.Viewport;
@@ -129,7 +128,7 @@ namespace rts
             initializeSelectionInfoArea();
             line.Alpha = .75f;
 
-            VisionUpdater = new VisionUpdater(map, Unit.PathFinder, Player.Me.Team);
+            VisionUpdater = new VisionUpdater(map, Rts.pathFinder, Player.Me.Team);
 
             SelectBox.InitializeSelectBoxLine(GraphicsDevice, Color.Green);
             Initializeline(GraphicsDevice, Color.Yellow);
@@ -345,10 +344,10 @@ namespace rts
             if (timeForPathFindingProfiling >= 500)
             {
                 double pathFindingTime;
-                lock (Unit.PathFinder.TimeSpentPathFindingLock)
+                lock (Rts.pathFinder.TimeSpentPathFindingLock)
                 {
-                    pathFindingTime = Unit.PathFinder.TimeSpentPathFinding.TotalMilliseconds;
-                    Unit.PathFinder.TimeSpentPathFinding = TimeSpan.Zero;
+                    pathFindingTime = Rts.pathFinder.TimeSpentPathFinding.TotalMilliseconds;
+                    Rts.pathFinder.TimeSpentPathFinding = TimeSpan.Zero;
                 }
                 pathFindingPercentage = pathFindingTime / timeForPathFindingProfiling * 100;
                 timeForPathFindingProfiling = 0;
@@ -487,7 +486,7 @@ namespace rts
         void cleanup()
         {
             Unit.UnitCollisionSweeper.Thread.Abort();
-            Unit.PathFinder.AbortThread();
+            Rts.pathFinder.AbortThread();
             VisionUpdater.Thread.Abort();
             lock (Unit.Units)
             {
@@ -519,7 +518,7 @@ namespace rts
             {
                 PathFindRequest.DonePathFindRequests.Clear();
             }
-            //Unit.PathFinder.SuspendThread();
+            //Rts.pathFinder.SuspendThread();
             //Game1.Game.DebugMonitor.Position = Direction.SouthEast;
             //Game1.Game.IsMouseVisible = true;
             //GraphicsDevice.Viewport = uiViewport;

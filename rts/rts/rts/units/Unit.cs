@@ -20,7 +20,6 @@ namespace rts
         //static PotentialCollisionSweeper potentialCollisionSweeper = new PotentialCollisionSweeper(5);
         public static UnitCollisionSweeper UnitCollisionSweeper = new UnitCollisionSweeper();
         //static UnitWallCollisionSweeper wallCollisionSweeper = new UnitWallCollisionSweeper();
-        static Map map;
 
         public Texture2D BulletTexture;
         public int BulletSize, BulletSpeed;
@@ -102,24 +101,24 @@ namespace rts
                 throw new Exception("unable to find path node containing unit");
             }*/
 
-            int y = (int)MathHelper.Clamp(CenterPoint.Y / Map.TileSize, 0, Map.Height - 1);
-            int x = (int)MathHelper.Clamp(CenterPoint.X / Map.TileSize, 0, Map.Width - 1);
+            int y = (int)MathHelper.Clamp(CenterPoint.Y / Rts.map.TileSize, 0, Rts.map.Height - 1);
+            int x = (int)MathHelper.Clamp(CenterPoint.X / Rts.map.TileSize, 0, Rts.map.Width - 1);
 
-            CurrentPathNode = PathFinder.PathNodes[y, x];
+            CurrentPathNode = Rts.pathFinder.PathNodes[y, x];
 
             // fill OccupiedPathNodes
             //-------------------------------------------------------------------------------
-            int posX = (int)MathHelper.Clamp(X / Map.TileSize, 0, Map.Width - 1);
-            int posY = (int)MathHelper.Clamp(Y / Map.TileSize, 0, Map.Height - 1);
-            int rightBoundX = (int)MathHelper.Clamp(posX + (int)Math.Ceiling(Width / (double)Map.TileSize), 0, Map.Width - 1);
-            int bottomBoundY = (int)MathHelper.Clamp(posY + (int)Math.Ceiling(Height / (double)Map.TileSize), 0, Map.Height - 1);
+            int posX = (int)MathHelper.Clamp(X / Rts.map.TileSize, 0, Rts.map.Width - 1);
+            int posY = (int)MathHelper.Clamp(Y / Rts.map.TileSize, 0, Rts.map.Height - 1);
+            int rightBoundX = (int)MathHelper.Clamp(posX + (int)Math.Ceiling(Width / (double)Rts.map.TileSize), 0, Rts.map.Width - 1);
+            int bottomBoundY = (int)MathHelper.Clamp(posY + (int)Math.Ceiling(Height / (double)Rts.map.TileSize), 0, Rts.map.Height - 1);
 
             OccupiedPathNodes.Clear();
             for (x = posX; x <= rightBoundX; x++)
             {
                 for (y = posY; y <= bottomBoundY; y++)
                 {
-                    PathNode neighbor = PathFinder.PathNodes[y, x];
+                    PathNode neighbor = Rts.pathFinder.PathNodes[y, x];
                     if (Intersects(neighbor.Tile))
                         OccupiedPathNodes.Add(neighbor);
                 }
@@ -128,17 +127,17 @@ namespace rts
 
             // fill PathNodeBufferSquare
             //-------------------------------------------------------------------------------
-            posX = (int)MathHelper.Clamp(X / Map.TileSize - 1, 0, Map.Width - 1);
-            posY = (int)MathHelper.Clamp(Y / Map.TileSize - 1, 0, Map.Height - 1);
-            rightBoundX = (int)MathHelper.Clamp((int)((X + Width) / (double)Map.TileSize + 1), 0, Map.Width - 1);
-            bottomBoundY = (int)MathHelper.Clamp((int)((Y + Height) / (double)Map.TileSize + 1), 0, Map.Height - 1);
+            posX = (int)MathHelper.Clamp(X / Rts.map.TileSize - 1, 0, Rts.map.Width - 1);
+            posY = (int)MathHelper.Clamp(Y / Rts.map.TileSize - 1, 0, Rts.map.Height - 1);
+            rightBoundX = (int)MathHelper.Clamp((int)((X + Width) / (double)Rts.map.TileSize + 1), 0, Rts.map.Width - 1);
+            bottomBoundY = (int)MathHelper.Clamp((int)((Y + Height) / (double)Rts.map.TileSize + 1), 0, Rts.map.Height - 1);
 
             PathNodeBufferSquare.Clear();
             for (x = posX; x <= rightBoundX; x++)
             {
                 for (y = posY; y <= bottomBoundY; y++)
                 {
-                    PathNodeBufferSquare.Add(PathFinder.PathNodes[y, x]);
+                    PathNodeBufferSquare.Add(Rts.pathFinder.PathNodes[y, x]);
                 }
             }
             //-------------------------------------------------------------------------------
@@ -160,10 +159,10 @@ namespace rts
             foreach (PathNode pathNode in OccupiedPathNodes)
                 pathNode.UnitsContained.Remove(this);
 
-            int y = (int)MathHelper.Clamp(CenterPoint.Y / Map.TileSize, 0, Map.Height - 1);
-            int x = (int)MathHelper.Clamp(CenterPoint.X / Map.TileSize, 0, Map.Width - 1);
+            int y = (int)MathHelper.Clamp(CenterPoint.Y / Rts.map.TileSize, 0, Rts.map.Height - 1);
+            int x = (int)MathHelper.Clamp(CenterPoint.X / Rts.map.TileSize, 0, Rts.map.Width - 1);
 
-            CurrentPathNode = PathFinder.PathNodes[y, x];
+            CurrentPathNode = Rts.pathFinder.PathNodes[y, x];
 
             //if (!CurrentPathNode.Tile.Walkable)
             //if (!PathFinder.IsTileWalkable(CurrentPathNode.Tile.Y, CurrentPathNode.Tile.X, this))
@@ -176,17 +175,17 @@ namespace rts
 
             // fill OccupiedPathNodes
             //-------------------------------------------------------------------------------
-            int posX = (int)MathHelper.Clamp(X / Map.TileSize, 0, Map.Width - 1);
-            int posY = (int)MathHelper.Clamp(Y / Map.TileSize, 0, Map.Height - 1);
-            int rightBoundX = (int)MathHelper.Clamp(posX + (int)Math.Ceiling(Width / (double)Map.TileSize), 0, Map.Width - 1);
-            int bottomBoundY = (int)MathHelper.Clamp(posY + (int)Math.Ceiling(Height / (double)Map.TileSize), 0, Map.Height - 1);
+            int posX = (int)MathHelper.Clamp(X / Rts.map.TileSize, 0, Rts.map.Width - 1);
+            int posY = (int)MathHelper.Clamp(Y / Rts.map.TileSize, 0, Rts.map.Height - 1);
+            int rightBoundX = (int)MathHelper.Clamp(posX + (int)Math.Ceiling(Width / (double)Rts.map.TileSize), 0, Rts.map.Width - 1);
+            int bottomBoundY = (int)MathHelper.Clamp(posY + (int)Math.Ceiling(Height / (double)Rts.map.TileSize), 0, Rts.map.Height - 1);
 
             OccupiedPathNodes.Clear();
             for (x = posX; x <= rightBoundX; x++)
             {
                 for (y = posY; y <= bottomBoundY; y++)
                 {
-                    PathNode neighbor = PathFinder.PathNodes[y, x];
+                    PathNode neighbor = Rts.pathFinder.PathNodes[y, x];
                     if (Intersects(neighbor.Tile))
                         OccupiedPathNodes.Add(neighbor);
                 }
@@ -195,19 +194,19 @@ namespace rts
 
             // fill PathNodeBufferSquare
             //-------------------------------------------------------------------------------
-            posX = (int)MathHelper.Clamp(X / Map.TileSize - 1, 0, Map.Width - 1);
-            posY = (int)MathHelper.Clamp(Y / Map.TileSize - 1, 0, Map.Height - 1);
+            posX = (int)MathHelper.Clamp(X / Rts.map.TileSize - 1, 0, Rts.map.Width - 1);
+            posY = (int)MathHelper.Clamp(Y / Rts.map.TileSize - 1, 0, Rts.map.Height - 1);
             //rightBoundX = (int)MathHelper.Clamp(posX + (int)Math.Ceiling(Width / (double)Map.TileSize) + 2, 0, Map.Width - 1);
             //bottomBoundY = (int)MathHelper.Clamp(posY + (int)Math.Ceiling(Height / (double)Map.TileSize) + 2, 0, Map.Height - 1);
-            rightBoundX = (int)MathHelper.Clamp((int)((X + Width) / (double)Map.TileSize + 1), 0, Map.Width - 1);
-            bottomBoundY = (int)MathHelper.Clamp((int)((Y + Height) / (double)Map.TileSize + 1), 0, Map.Height - 1);
+            rightBoundX = (int)MathHelper.Clamp((int)((X + Width) / (double)Rts.map.TileSize + 1), 0, Rts.map.Width - 1);
+            bottomBoundY = (int)MathHelper.Clamp((int)((Y + Height) / (double)Rts.map.TileSize + 1), 0, Rts.map.Height - 1);
 
             PathNodeBufferSquare.Clear();
             for (x = posX; x <= rightBoundX; x++)
             {
                 for (y = posY; y <= bottomBoundY; y++)
                 {
-                    PathNodeBufferSquare.Add(PathFinder.PathNodes[y, x]);
+                    PathNodeBufferSquare.Add(Rts.pathFinder.PathNodes[y, x]);
                 }
             }
             //-------------------------------------------------------------------------------
@@ -236,7 +235,7 @@ namespace rts
 
             if (stuck)
             {
-                CurrentPathNode = PathFinder.FindNearestPathNode(CurrentPathNode.Tile.Y, CurrentPathNode.Tile.X);//, this);
+                CurrentPathNode = Rts.pathFinder.FindNearestPathNode(CurrentPathNode.Tile.Y, CurrentPathNode.Tile.X);//, this);
                 CenterPoint = CurrentPathNode.Tile.CenterPoint;
             }
             /*if (!CurrentPathNode.Tile.Rectangle.Intersects(Rectangle))
@@ -249,25 +248,25 @@ namespace rts
                 box.UnitsContained.Remove(this);
             OccupiedBoundingBoxes.Clear();
 
-            x = (int)MathHelper.Clamp(X / Map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Map.Width - 1);
-            y = (int)MathHelper.Clamp(Y / Map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Map.Height - 1);
-            map.BigBoundingBoxes[y, x].UnitsContained.Add(this);
-            OccupiedBoundingBoxes.Add(map.BigBoundingBoxes[y, x]);
+            x = (int)MathHelper.Clamp(X / Rts.map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Rts.map.Width - 1);
+            y = (int)MathHelper.Clamp(Y / Rts.map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Rts.map.Height - 1);
+            Rts.map.BigBoundingBoxes[y, x].UnitsContained.Add(this);
+            OccupiedBoundingBoxes.Add(Rts.map.BigBoundingBoxes[y, x]);
 
-            x = (int)MathHelper.Clamp((X + Width) / Map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Map.Width - 1);
-            y = (int)MathHelper.Clamp(Y / Map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Map.Height - 1);
-            map.BigBoundingBoxes[y, x].UnitsContained.Add(this);
-            OccupiedBoundingBoxes.Add(map.BigBoundingBoxes[y, x]);
+            x = (int)MathHelper.Clamp((X + Width) / Rts.map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Rts.map.Width - 1);
+            y = (int)MathHelper.Clamp(Y / Rts.map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Rts.map.Height - 1);
+            Rts.map.BigBoundingBoxes[y, x].UnitsContained.Add(this);
+            OccupiedBoundingBoxes.Add(Rts.map.BigBoundingBoxes[y, x]);
 
-            x = (int)MathHelper.Clamp(X / Map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Map.Width - 1);
-            y = (int)MathHelper.Clamp((Y + Height) / Map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Map.Height - 1);
-            map.BigBoundingBoxes[y, x].UnitsContained.Add(this);
-            OccupiedBoundingBoxes.Add(map.BigBoundingBoxes[y, x]);
+            x = (int)MathHelper.Clamp(X / Rts.map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Rts.map.Width - 1);
+            y = (int)MathHelper.Clamp((Y + Height) / Rts.map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Rts.map.Height - 1);
+            Rts.map.BigBoundingBoxes[y, x].UnitsContained.Add(this);
+            OccupiedBoundingBoxes.Add(Rts.map.BigBoundingBoxes[y, x]);
 
-            x = (int)MathHelper.Clamp((X + Width) / Map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Map.Width - 1);
-            y = (int)MathHelper.Clamp((Y + Height) / Map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Map.Height - 1);
-            map.BigBoundingBoxes[y, x].UnitsContained.Add(this);
-            OccupiedBoundingBoxes.Add(map.BigBoundingBoxes[y, x]);
+            x = (int)MathHelper.Clamp((X + Width) / Rts.map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Rts.map.Width - 1);
+            y = (int)MathHelper.Clamp((Y + Height) / Rts.map.TileSize / Map.BOUNDING_BOX_SIZE, 0, Rts.map.Height - 1);
+            Rts.map.BigBoundingBoxes[y, x].UnitsContained.Add(this);
+            OccupiedBoundingBoxes.Add(Rts.map.BigBoundingBoxes[y, x]);
 
         }
 
@@ -281,8 +280,8 @@ namespace rts
 
             //potentialCollisionSweeper.UpdatePotentialCollisions(UnitsSorted);
 
-            PathFinder.FinalizeAddingPathFindRequests();
-            PathFinder.FulfillDonePathFindRequests(netPeer, connection);
+            Rts.pathFinder.FinalizeAddingPathFindRequests();
+            Rts.pathFinder.FulfillDonePathFindRequests(netPeer, connection);
             UnitCollisionSweeper.FulFillCollisionLists();
             //VisionUpdater.FulFillVisionLists();
 
@@ -486,8 +485,10 @@ namespace rts
 
                     netPeer.SendMessage(msg, connection, NetDeliveryMethod.ReliableOrdered);
                 }
-                else
+                else if (HpChanged)
                 {
+                    HpChanged = false;
+
                     NetOutgoingMessage msg = netPeer.CreateMessage();
                     msg.Write(MessageID.UNIT_HP_UPDATE);
                     msg.Write(ID);
@@ -524,7 +525,7 @@ namespace rts
                 {
                     MoveCommand newMoveCommand = (MoveCommand)Commands[0];
                     //if (Team == Player.Me.Team)
-                        PathFinder.AddHighPriorityPathFindRequest(newMoveCommand, (int)Vector2.DistanceSquared(centerPoint, newMoveCommand.Destination), false);
+                    Rts.pathFinder.AddHighPriorityPathFindRequest(newMoveCommand, (int)Vector2.DistanceSquared(centerPoint, newMoveCommand.Destination), false);
                     //newMoveCommand.WayPoints = PathFinder.FindPath(CurrentPathNode, newMoveCommand.Destination, false);
                     IgnoringCollision = (newMoveCommand is HarvestCommand || newMoveCommand is ReturnCargoCommand);
                     return;
@@ -598,7 +599,7 @@ namespace rts
 
                     command.WayPoints = lastMoveCommand.WayPoints;
                     command.WayPoints.Add(command.Destination);
-                    PathFinder.SmoothPathEnd(command.WayPoints, this);
+                    Rts.pathFinder.SmoothPathEnd(command.WayPoints, this);
 
                     commandPriority = ((int)Vector2.DistanceSquared(lastMoveCommand.Destination, command.Destination) + (int)Vector2.DistanceSquared(centerPoint, command.Destination)) / 2;
                 }
@@ -672,7 +673,7 @@ namespace rts
                 commandPriority = (int)Vector2.DistanceSquared(centerPoint, command.Destination);
 
             //if (Team == Player.Me.Team)
-                PathFinder.AddHighPriorityPathFindRequest(command, commandPriority, false);
+            Rts.pathFinder.AddHighPriorityPathFindRequest(command, commandPriority, false);
 
             Commands.Insert(0, command);
         }
@@ -810,7 +811,7 @@ namespace rts
                 if (Contains(wayPoint))
                 {
                     lastWayPoint = wayPoint;
-                    command.NextWayPoint(this, PathFinder);
+                    command.NextWayPoint(this, Rts.pathFinder);
                     return;
                 }
             }
@@ -860,7 +861,7 @@ namespace rts
             if (timeSinceLastSmoothPath >= smoothPathDelay)
             {
                 timeSinceLastSmoothPath = 0;
-                PathFinder.SmoothImmediatePath(command.WayPoints, this);
+                Rts.pathFinder.SmoothImmediatePath(command.WayPoints, this, centerPoint);
             }
         }
 
@@ -928,7 +929,7 @@ namespace rts
 
                         lastWayPoint = wayPoint;
                         if (command.WayPoints.Count > 1)
-                            command.NextWayPoint(this, PathFinder);
+                            command.NextWayPoint(this, Rts.pathFinder);
                         return;
                     }
 
@@ -959,7 +960,7 @@ namespace rts
                     {
                         timeSinceLastRecalculatePath = 0;
 
-                        PathFinder.AddLowPriorityPathFindRequest(this, command, CurrentPathNode, (int)Vector2.DistanceSquared(centerPoint, command.Destination), avoidingUnits);
+                        Rts.pathFinder.AddLowPriorityPathFindRequest(this, command, CurrentPathNode, (int)Vector2.DistanceSquared(centerPoint, command.Destination), avoidingUnits);
                     }
                     // repath to avoid units
                     /*if (avoidingUnits)
@@ -1068,7 +1069,7 @@ namespace rts
             {
                 foreach (MapTile tile in VisibleTiles)
                 {
-                    PathNode pathNode = PathFinder.PathNodes[tile.Y, tile.X];
+                    PathNode pathNode = Rts.pathFinder.PathNodes[tile.Y, tile.X];
                     foreach (Unit unit in pathNode.UnitsContained)
                     {
                         if (unit.Targetable && unit.Team != Team)
@@ -1147,7 +1148,7 @@ namespace rts
                         if (timeSinceLastRecalculatePath >= recalculatePathDelay && command.Calculated)
                         {
                             timeSinceLastRecalculatePath = 0;
-                            PathFinder.AddLowPriorityPathFindRequest(this, command, CurrentPathNode, (int)Vector2.DistanceSquared(centerPoint, command.Destination), false);
+                            Rts.pathFinder.AddLowPriorityPathFindRequest(this, command, CurrentPathNode, (int)Vector2.DistanceSquared(centerPoint, command.Destination), false);
                         }
 
                         float angle = (float)Math.Atan2(unit.centerPoint.Y - centerPoint.Y, unit.centerPoint.X - centerPoint.X);
@@ -1165,7 +1166,7 @@ namespace rts
                             lastWayPoint = command.WayPoints[0];
                             if (!(command is BuildStructureCommand))
                             {
-                                command.NextWayPoint(this, PathFinder);
+                                command.NextWayPoint(this, Rts.pathFinder);
                                 if (command.WayPoints.Count == 0)
                                 {
                                     NextCommand();
@@ -1179,14 +1180,14 @@ namespace rts
                             lastWayPoint = command.WayPoints[0];
                             if (!(command is BuildStructureCommand))
                             {
-                                command.NextWayPoint(this, PathFinder);
+                                command.NextWayPoint(this, Rts.pathFinder);
                                 if (command.WayPoints.Count == 0)
                                 {
                                     NextCommand();
                                     return true;
                                 }
                             }
-                            command.NextWayPoint(this, PathFinder);
+                            command.NextWayPoint(this, Rts.pathFinder);
                             if (command.WayPoints.Count == 0 && !(command is BuildStructureCommand))
                             {
                                 NextCommand();
@@ -1199,7 +1200,7 @@ namespace rts
                             lastWayPoint = command.WayPoints[0];
                             if (!(command is BuildStructureCommand))
                             {
-                                command.NextWayPoint(this, PathFinder);
+                                command.NextWayPoint(this, Rts.pathFinder);
                                 if (command.WayPoints.Count == 0)
                                 {
                                     NextCommand();
@@ -1527,7 +1528,7 @@ namespace rts
                     if (command != null && timeSinceLastRecalculatePath >= recalculatePathDelay && command.Calculated)
                     {
                         timeSinceLastRecalculatePath = 0;
-                        PathFinder.AddLowPriorityPathFindRequest(this, command, CurrentPathNode, (int)Vector2.DistanceSquared(centerPoint, command.Destination), false);
+                        Rts.pathFinder.AddLowPriorityPathFindRequest(this, command, CurrentPathNode, (int)Vector2.DistanceSquared(centerPoint, command.Destination), false);
                     }
 
                     float angle = (float)Math.Atan2(centerPoint.Y - tile.CenterPoint.Y, centerPoint.X - tile.CenterPoint.X);
@@ -1836,19 +1837,6 @@ namespace rts
             get
             {
                 return centerPoint.Y + Radius * 1.5f;
-            }
-        }
-
-        public static Map Map
-        {
-            get
-            {
-                return map;
-            }
-            set
-            {
-                map = value;
-                //PathFinder = new PathFinder(map);
             }
         }
 
