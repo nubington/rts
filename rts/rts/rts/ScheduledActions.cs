@@ -31,7 +31,7 @@ namespace rts
             if (moveCommand != null)
             {
                 // add new command to pathfinding queue
-                Rts.pathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
+                Rts.pathFinder.AddPathFindRequest(moveCommand, queued, false, false);
             }
         }
     }

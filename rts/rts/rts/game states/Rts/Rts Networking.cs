@@ -391,7 +391,7 @@ namespace rts
 
                         BuildStructureCommand buildStructureCommand = new BuildStructureCommand(unit, structureType, location, new Vector2(location.X * map.TileSize + structureType.Size * map.TileSize / 2, location.Y * map.TileSize + structureType.Size * map.TileSize / 2), 1);
                         Player.Players[team].ScheduledActions.Add(new ScheduledUnitBuildCommand(scheduledTime, buildStructureCommand, queued));
-                        Rts.pathFinder.AddHighPriorityPathFindRequest(buildStructureCommand, (int)Vector2.DistanceSquared(buildStructureCommand.Unit.CenterPoint, buildStructureCommand.Destination), false);
+                        //Rts.pathFinder.AddPathFindRequest(buildStructureCommand, queued, false, false);
 
                     }
                     else if (id == MessageID.UNIT_HARVEST_COMMAND_BATCH)

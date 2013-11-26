@@ -404,7 +404,7 @@ namespace rts
                 if (harvestCommand != null)
                 {
                     GiveCommand(harvestCommand);
-                    Rts.pathFinder.AddHighPriorityPathFindRequest(harvestCommand, (int)Vector2.DistanceSquared(centerPoint, harvestCommand.Destination), false);
+                    Rts.pathFinder.AddPathFindRequest(harvestCommand, false, false, false);
                 }
             }
 

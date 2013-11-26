@@ -525,7 +525,7 @@ namespace rts
                 {
                     MoveCommand newMoveCommand = (MoveCommand)Commands[0];
                     //if (Team == Player.Me.Team)
-                    Rts.pathFinder.AddHighPriorityPathFindRequest(newMoveCommand, (int)Vector2.DistanceSquared(centerPoint, newMoveCommand.Destination), false);
+                    Rts.pathFinder.AddPathFindRequest(newMoveCommand, false, false, false);
                     //newMoveCommand.WayPoints = PathFinder.FindPath(CurrentPathNode, newMoveCommand.Destination, false);
                     IgnoringCollision = (newMoveCommand is HarvestCommand || newMoveCommand is ReturnCargoCommand);
                     return;
@@ -666,14 +666,14 @@ namespace rts
             timeSinceLastRecalculatePath = 0;
             IgnoringCollision = (command is HarvestCommand || command is ReturnCargoCommand);
 
-            int commandPriority;
+            /*int commandPriority;
             if (command is ReturnCargoCommand || command is HarvestCommand)
                 commandPriority = int.MaxValue / 2 + (int)Vector2.DistanceSquared(centerPoint, command.Destination);
             else
-                commandPriority = (int)Vector2.DistanceSquared(centerPoint, command.Destination);
+                commandPriority = (int)Vector2.DistanceSquared(centerPoint, command.Destination);*/
 
             //if (Team == Player.Me.Team)
-            Rts.pathFinder.AddHighPriorityPathFindRequest(command, commandPriority, false);
+            Rts.pathFinder.AddPathFindRequest(command, false, false, false);
 
             Commands.Insert(0, command);
         }
@@ -960,7 +960,7 @@ namespace rts
                     {
                         timeSinceLastRecalculatePath = 0;
 
-                        Rts.pathFinder.AddLowPriorityPathFindRequest(this, command, CurrentPathNode, (int)Vector2.DistanceSquared(centerPoint, command.Destination), avoidingUnits);
+                        Rts.pathFinder.AddPathFindRequest(command, false, true, avoidingUnits);
                     }
                     // repath to avoid units
                     /*if (avoidingUnits)
@@ -1148,7 +1148,7 @@ namespace rts
                         if (timeSinceLastRecalculatePath >= recalculatePathDelay && command.Calculated)
                         {
                             timeSinceLastRecalculatePath = 0;
-                            Rts.pathFinder.AddLowPriorityPathFindRequest(this, command, CurrentPathNode, (int)Vector2.DistanceSquared(centerPoint, command.Destination), false);
+                            Rts.pathFinder.AddPathFindRequest(command, false, true, false);
                         }
 
                         float angle = (float)Math.Atan2(unit.centerPoint.Y - centerPoint.Y, unit.centerPoint.X - centerPoint.X);
@@ -1528,7 +1528,7 @@ namespace rts
                     if (command != null && timeSinceLastRecalculatePath >= recalculatePathDelay && command.Calculated)
                     {
                         timeSinceLastRecalculatePath = 0;
-                        Rts.pathFinder.AddLowPriorityPathFindRequest(this, command, CurrentPathNode, (int)Vector2.DistanceSquared(centerPoint, command.Destination), false);
+                        Rts.pathFinder.AddPathFindRequest(command, false, true, false);
                     }
 
                     float angle = (float)Math.Atan2(centerPoint.Y - tile.CenterPoint.Y, centerPoint.X - tile.CenterPoint.X);

@@ -595,7 +595,7 @@ namespace rts
             Player.Players[workerWithSmallestQueue.Team].ScheduledActions.Add(scheduledUnitBuildCommand);
             Player.Players[workerWithSmallestQueue.Team].Roks -= placingStructureType.RoksCost;
 
-            Rts.pathFinder.AddHighPriorityPathFindRequest(buildStructureCommand, (int)Vector2.DistanceSquared(buildStructureCommand.Unit.CenterPoint, buildStructureCommand.Destination), false);
+            Rts.pathFinder.AddPathFindRequest(buildStructureCommand, usingShift, false, false);
 
             NetOutgoingMessage msg = netPeer.CreateMessage();
 

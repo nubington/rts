@@ -539,7 +539,7 @@ namespace rts
                     if (command != null)
                     {
                         unit.GiveCommand(command);
-                        Rts.pathFinder.AddHighPriorityPathFindRequest(command, (int)Vector2.DistanceSquared(centerPoint, command.Destination), false);
+                        Rts.pathFinder.AddPathFindRequest(command, false, false, false);
                     }
 
                     for (int i = 1; i < RallyPoints.Count; i++)
