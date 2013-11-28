@@ -1,17 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Audio;
-using System.Diagnostics;
 using System.Windows.Forms;
-using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
-using Lidgren.Network;
-using Lidgren.Network.Xna;
 
 namespace rts
 {
@@ -231,7 +223,7 @@ namespace rts
                         line.Colour = Color.Black;
                         //lock (SelectedUnits[0].PotentialCollisions)
                         //{
-                        foreach (Unit u in SelectedUnits[0].PotentialCollisions)
+                        foreach (Unit u in unit.PotentialCollisions)
                         {
                             line.ClearVectors();
                             line.AddVector(SelectedUnits[0].CenterPoint);
@@ -383,7 +375,7 @@ namespace rts
 
             // move command shrinker things
             foreach (Shrinker shrinker in Shrinker.Shrinkers)
-                spriteBatch.Draw(shrinker.Texture, shrinker, Color.White);
+                spriteBatch.Draw(shrinker.Texture, shrinker.Rectangle, Color.White);
             //spriteBatch.Draw(shrinker.Texture, new Rectangle((int)shrinker.CenterPoint.X, (int)shrinker.CenterPoint.Y, shrinker.Width, shrinker.Height), null, Color.White, shrinker.Rotation, shrinker.TextureCenterOrigin, SpriteEffects.None, 0f);
 
             // all bounding boxes
@@ -424,7 +416,7 @@ namespace rts
             Vector2 button1TextSize = fpsFont.MeasureString("1");
             spriteBatch.DrawString(fpsFont, "1", new Vector2((int)(button1.X + button1.Width / 2 - button1TextSize.X / 2), (int)(button1.Y + button1.Height / 2 - button1TextSize.Y / 2)), Color.White);
             */
-            spriteBatch.Draw(buttonTexture, button2, Color.White);
+            spriteBatch.Draw(buttonTexture, button2.Rectangle, Color.White);
             Vector2 button2TextSize = fpsFont.MeasureString("10");
             spriteBatch.DrawString(fpsFont, "10", new Vector2((int)(button2.X + button2.Width / 2 - button2TextSize.X / 2), (int)(button2.Y + button2.Height / 2 - button2TextSize.Y / 2)), Color.White);
             /*spriteBatch.Draw(buttonTexture, button3, Color.White);
@@ -1394,7 +1386,7 @@ namespace rts
 
                     spriteBatch.Draw(box.Unit.Texture, shrunkenBox, Color.White);
                     if (box.Unit.Type == SelectedUnits.ActiveType)
-                        spriteBatch.Draw(box.Texture, box, Color.White);
+                        spriteBatch.Draw(box.Texture, box.Rectangle, Color.White);
 
                     //hp bar
                     int hpBarHeight = box.Height / 6;
@@ -1571,9 +1563,9 @@ namespace rts
             foreach (CommandButton button in CommandCardButtons)
             {
                 if (button.Pressing || button.PressingHotkey || (selectedUnitsHoldingPosition && button.Type == CommandButtonType.HoldPosition))
-                    spriteBatch.Draw(transparentGrayTexture, button, Color.White);
-                spriteBatch.Draw(button.Texture, button, Color.White);
-                spriteBatch.Draw(whiteBoxTexture, button, Color.White);
+                    spriteBatch.Draw(transparentGrayTexture, button.Rectangle, Color.White);
+                spriteBatch.Draw(button.Texture, button.Rectangle, Color.White);
+                spriteBatch.Draw(whiteBoxTexture, button.Rectangle, Color.White);
                 if (button.Hotkey != Keys.Kana)
                 {
                     string hotkeyString = button.Hotkey.ToString();

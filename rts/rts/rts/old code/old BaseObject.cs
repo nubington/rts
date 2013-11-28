@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-
-namespace rts
+﻿namespace rts.old_code
 {
-    public class BaseObject
+    /*public class BaseObject
     {
         public static GraphicsDeviceManager graphics = Game1.Game.Graphics;
         protected static Random rand = new Random();
 
+        public List<BaseObject> potentialCollisions = new List<BaseObject>();
+
         protected Rectangle rectangle;
         protected int greaterOfWidthAndHeight;
         private float rotation;
+        public Vector2 Origin;
         private Vector2 upperLeftCorner, upperRightCorner, lowerLeftCorner, lowerRightCorner;
 
         private Texture2D texture;
@@ -34,6 +31,7 @@ namespace rts
             maxY = graphics.GraphicsDevice.Viewport.Height - rectangle.Height;
             minY = 0;
             Rotation = 0f;
+            Origin = new Vector2(Width / 2, Height / 2);
             centerPoint = new Vector2(rectangle.X + rectangle.Width / 2, rectangle.Y + rectangle.Height / 2);
             greaterOfWidthAndHeight = (rectangle.Width > rectangle.Height ? rectangle.Width : rectangle.Height);
             //CalculateCorners();
@@ -181,6 +179,7 @@ namespace rts
                 greaterOfWidthAndHeight = (rectangle.Width > rectangle.Height ? rectangle.Width : rectangle.Height);
                 maxX = graphics.GraphicsDevice.Viewport.Width - rectangle.Width;
                 centerPoint.X = rectangle.X + rectangle.Width / 2;
+                Origin.X = rectangle.Width / 2;
             }
         }
         public int Height
@@ -195,6 +194,7 @@ namespace rts
                 greaterOfWidthAndHeight = (rectangle.Width > rectangle.Height ? rectangle.Width : rectangle.Height);
                 maxY = graphics.GraphicsDevice.Viewport.Height - rectangle.Height;
                 centerPoint.Y = rectangle.Y + rectangle.Height / 2;
+                Origin.Y = rectangle.Height / 2;
             }
         }
         public int GreaterOfWidthAndHeight
@@ -332,7 +332,91 @@ namespace rts
                 return textureCenterOrigin;
             }
         }
+        public static implicit operator Rectangle(BaseObject o)
+        {
+            return o.Rectangle;
+        }
 
+        List<int> aRectangleAScalars = new List<int>();
+        List<int> aRectangleBScalars = new List<int>();
+        private bool IsAxisCollision(BaseObject theRectangle, Vector2 aAxis)
+        {
+            //List<int> aRectangleAScalars = new List<int>();
+            aRectangleAScalars.Clear();
+            aRectangleAScalars.Add(GenerateScalar(theRectangle.UpperLeftCorner, aAxis));
+            aRectangleAScalars.Add(GenerateScalar(theRectangle.UpperRightCorner, aAxis));
+            aRectangleAScalars.Add(GenerateScalar(theRectangle.LowerLeftCorner, aAxis));
+            aRectangleAScalars.Add(GenerateScalar(theRectangle.LowerRightCorner, aAxis));
+
+            //List<int> aRectangleBScalars = new List<int>();
+            aRectangleBScalars.Clear();
+            aRectangleBScalars.Add(GenerateScalar(UpperLeftCorner, aAxis));
+            aRectangleBScalars.Add(GenerateScalar(UpperRightCorner, aAxis));
+            aRectangleBScalars.Add(GenerateScalar(LowerLeftCorner, aAxis));
+            aRectangleBScalars.Add(GenerateScalar(LowerRightCorner, aAxis));
+
+            int aRectangleAMinimum = aRectangleAScalars.Min();
+            int aRectangleAMaximum = aRectangleAScalars.Max();
+            int aRectangleBMinimum = aRectangleBScalars.Min();
+            int aRectangleBMaximum = aRectangleBScalars.Max();
+
+            if (aRectangleBMinimum <= aRectangleAMaximum && aRectangleBMaximum >= aRectangleAMaximum)
+            {
+                return true;
+            }
+            else if (aRectangleAMinimum <= aRectangleBMaximum && aRectangleAMaximum >= aRectangleBMaximum)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        private bool IsAxisCollision(Vector2 v, Vector2 aAxis)
+        {
+            //List<int> aRectangleAScalars = new List<int>();
+            aRectangleAScalars.Clear();
+            aRectangleAScalars.Add(GenerateScalar(v, aAxis));
+            aRectangleAScalars.Add(GenerateScalar(v, aAxis));
+            aRectangleAScalars.Add(GenerateScalar(v, aAxis));
+            aRectangleAScalars.Add(GenerateScalar(v, aAxis));
+
+            //List<int> aRectangleBScalars = new List<int>();
+            aRectangleBScalars.Clear();
+            aRectangleBScalars.Add(GenerateScalar(UpperLeftCorner, aAxis));
+            aRectangleBScalars.Add(GenerateScalar(UpperRightCorner, aAxis));
+            aRectangleBScalars.Add(GenerateScalar(LowerLeftCorner, aAxis));
+            aRectangleBScalars.Add(GenerateScalar(LowerRightCorner, aAxis));
+
+            int aRectangleAMinimum = aRectangleAScalars.Min();
+            int aRectangleAMaximum = aRectangleAScalars.Max();
+            int aRectangleBMinimum = aRectangleBScalars.Min();
+            int aRectangleBMaximum = aRectangleBScalars.Max();
+
+            if (aRectangleBMinimum <= aRectangleAMaximum && aRectangleBMaximum >= aRectangleAMaximum)
+            {
+                return true;
+            }
+            else if (aRectangleAMinimum <= aRectangleBMaximum && aRectangleAMaximum >= aRectangleBMaximum)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        Vector2 aCornerProjected = new Vector2();
+        private int GenerateScalar(Vector2 theRectangleCorner, Vector2 theAxis)
+        {
+            float aNumerator = (theRectangleCorner.X * theAxis.X) + (theRectangleCorner.Y * theAxis.Y);
+            float aDenominator = (theAxis.X * theAxis.X) + (theAxis.Y * theAxis.Y);
+            float aDivisionResult = aNumerator / aDenominator;
+            //Vector2 aCornerProjected = new Vector2(aDivisionResult * theAxis.X, aDivisionResult * theAxis.Y);
+            aCornerProjected.X = aDivisionResult * theAxis.X;
+            aCornerProjected.Y = aDivisionResult * theAxis.Y;
+
+            float aScalar = (theAxis.X * aCornerProjected.X) + (theAxis.Y * aCornerProjected.Y);
+            return (int)aScalar;
+        }
         Vector2 aTranslatedPoint = new Vector2();
         private Vector2 RotatePoint(Vector2 thePoint, Vector2 theOrigin, float theRotation)
         {
@@ -349,7 +433,7 @@ namespace rts
             aUpperLeft.X = rectangle.Left;
             aUpperLeft.Y = rectangle.Top;
             //Vector2 aUpperLeft = new Vector2(Rectangle.Left, Rectangle.Top);
-            aUpperLeft = RotatePoint(aUpperLeft, centerPoint, Rotation);
+            aUpperLeft = RotatePoint(aUpperLeft, aUpperLeft + Origin, Rotation);
             return aUpperLeft;
         }
         Vector2 aUpperRight = new Vector2();
@@ -358,7 +442,7 @@ namespace rts
             aUpperRight.X = rectangle.Right;
             aUpperRight.Y = rectangle.Top;
             //Vector2 aUpperRight = new Vector2(Rectangle.Right, Rectangle.Top);
-            aUpperRight = RotatePoint(aUpperRight, centerPoint, Rotation);
+            aUpperRight = RotatePoint(aUpperRight, aUpperRight + new Vector2(-Origin.X, Origin.Y), Rotation);
             return aUpperRight;
         }
         Vector2 aLowerLeft = new Vector2();
@@ -367,7 +451,7 @@ namespace rts
             aLowerLeft.X = rectangle.Left;
             aLowerLeft.Y = rectangle.Bottom;
             //Vector2 aLowerLeft = new Vector2(Rectangle.Left, Rectangle.Bottom);
-            aLowerLeft = RotatePoint(aLowerLeft, centerPoint, Rotation);
+            aLowerLeft = RotatePoint(aLowerLeft, aLowerLeft + new Vector2(Origin.X, -Origin.Y), Rotation);
             return aLowerLeft;
         }
         Vector2 aLowerRight = new Vector2();
@@ -376,7 +460,7 @@ namespace rts
             aLowerRight.X = rectangle.Right;
             aLowerRight.Y = rectangle.Bottom;
             //Vector2 aLowerRight = new Vector2(Rectangle.Right, Rectangle.Bottom);
-            aLowerRight = RotatePoint(aLowerRight, centerPoint, Rotation);
+            aLowerRight = RotatePoint(aLowerRight, aLowerRight + new Vector2(-Origin.X, -Origin.Y), Rotation);
             return aLowerRight;
         }
         public void CalculateCorners()
@@ -392,14 +476,48 @@ namespace rts
             return (point.X >= preciseX && point.X <= preciseX + rectangle.Width &&
                 point.Y >= preciseY && point.Y <= preciseY + rectangle.Height);
         }
+        public bool TouchesRotated(Vector2 v)
+        {
+            List<Vector2> aRectangleAxis = new List<Vector2>();
+            aRectangleAxis.Add(UpperRightCorner - UpperLeftCorner);
+            aRectangleAxis.Add(UpperRightCorner - LowerRightCorner);
+            aRectangleAxis.Add(v - v);
+            aRectangleAxis.Add(v - v);
+
+            foreach (Vector2 aAxis in aRectangleAxis)
+            {
+                if (!IsAxisCollision(v, aAxis))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         public bool Intersects(Rectangle theRectangle)
         {
-            return Rectangle.Intersects(theRectangle);
+            BaseObject o = new BaseObject(theRectangle, 0.0f);
+            o.CalculateCorners();
+            return Intersects(o);
         }
-        public virtual bool Intersects(BaseObject o)
+        public virtual bool Intersects(BaseObject theRectangle)
         {
-            return Rectangle.Intersects(o.Rectangle);
+            List<Vector2> aRectangleAxis = new List<Vector2>();
+            aRectangleAxis.Add(UpperRightCorner - UpperLeftCorner);
+            aRectangleAxis.Add(UpperRightCorner - LowerRightCorner);
+            aRectangleAxis.Add(theRectangle.UpperLeftCorner - theRectangle.LowerLeftCorner);
+            aRectangleAxis.Add(theRectangle.UpperLeftCorner - theRectangle.UpperRightCorner);
+
+            foreach (Vector2 aAxis in aRectangleAxis)
+            {
+                if (!IsAxisCollision(theRectangle, aAxis))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public bool IsNear(Vector2 point)
@@ -410,21 +528,21 @@ namespace rts
         }
         public bool IsNear(Vector2 point, float factor)
         {
-            /*int factorWidth = (int)(this.Width * factor),
-                factorHeight = (int)(this.Height * factor);
-            return (point.X > this.X - factorWidth && point.X < this.X + this.Width + factorWidth &&
-                point.Y > this.Y - factorHeight && point.Y < this.Y + this.Height + factorHeight);*/
+            //int factorWidth = (int)(this.Width * factor),
+            //    factorHeight = (int)(this.Height * factor);
+            //return (point.X > this.X - factorWidth && point.X < this.X + this.Width + factorWidth &&
+            //    point.Y > this.Y - factorHeight && point.Y < this.Y + this.Height + factorHeight);
             Rectangle inflatedRectangle = new Rectangle(X, Y, Width, Height);
             inflatedRectangle.Inflate((int)(Width * factor), (int)(Height * factor));
             return inflatedRectangle.Contains((int)point.X, (int)point.Y);
         }
         public bool IsNear(Rectangle r, float factor)
         {
-            /*Vector2 point1 = new Vector2(r.X, r.Y);
-            Vector2 point2 = new Vector2(r.X + r.Width, r.Y);
-            Vector2 point3 = new Vector2(r.X + r.Width, r.Y + r.Height);
-            Vector2 point4 = new Vector2(r.X, r.Y + r.Height);
-            return IsNear(point1, factor) || IsNear(point2, factor) || IsNear(point3, factor) || IsNear(point4, factor);*/
+            //Vector2 point1 = new Vector2(r.X, r.Y);
+            //Vector2 point2 = new Vector2(r.X + r.Width, r.Y);
+            //Vector2 point3 = new Vector2(r.X + r.Width, r.Y + r.Height);
+            //Vector2 point4 = new Vector2(r.X, r.Y + r.Height);
+            //return IsNear(point1, factor) || IsNear(point2, factor) || IsNear(point3, factor) || IsNear(point4, factor);
 
             //int adjustedWidth = (int)(this.Width + this.Width * factor * 2);
             //int adjustedHeight = (int)(this.Width + this.Height * factor * 2);
@@ -440,15 +558,37 @@ namespace rts
             return r.Intersects(inflatedRectangle);
         }
 
-        public void Move(GameTime gameTime, bool restrictToScreen)
+        public void move(GameTime gameTime, bool restrictToScreen)
         {
-            Move(speed, gameTime, restrictToScreen);
+            move(speed, gameTime, restrictToScreen);
         }
-        public void Move(float angle, GameTime gameTime, bool restrictToScreen)
+        public void move(float angle, GameTime gameTime, bool restrictToScreen)
         {
-            Move(new Vector2(speed.X * (float)Math.Cos(angle), speed.Y * (float)Math.Sin(angle)), gameTime, restrictToScreen);
+            move(new Vector2(speed.X * (float)Math.Cos(angle), speed.Y * (float)Math.Sin(angle)), gameTime, restrictToScreen);
         }
-        public void Move(Vector2 movement, GameTime gameTime, bool restrictToScreen)
+        public void move(Vector2 movement, GameTime gameTime, bool restrictToScreen)
+        {
+            lastMove.X = (float)Math.Round(Util.ScaleWithGameTime(movement.X, gameTime));
+            lastMove.Y = (float)Math.Round(Util.ScaleWithGameTime(movement.Y, gameTime));
+
+            Position += lastMove;
+
+            if (restrictToScreen)
+            {
+                X = (int)MathHelper.Clamp(X, minX, maxX);
+                Y = (int)MathHelper.Clamp(Y, minY, maxY);
+            }
+        }
+
+        public void movePrecise(GameTime gameTime, bool restrictToScreen)
+        {
+            movePrecise(speed, gameTime, restrictToScreen);
+        }
+        public void movePrecise(float angle, GameTime gameTime, bool restrictToScreen)
+        {
+            movePrecise(new Vector2(speed.X * (float)Math.Cos(angle), speed.Y * (float)Math.Sin(angle)), gameTime, restrictToScreen);
+        }
+        public void movePrecise(Vector2 movement, GameTime gameTime, bool restrictToScreen)
         {
             lastMove.X = Util.ScaleWithGameTime(movement.X, gameTime);
             lastMove.Y = Util.ScaleWithGameTime(movement.Y, gameTime);
@@ -462,7 +602,32 @@ namespace rts
             }
         }
 
-        public void MoveTowards(Vector2 destination, GameTime gameTime, bool restrictToScreen)
+        public void moveTowards(Vector2 destination, GameTime gameTime, bool restrictToScreen)
+        {
+            lastMove.X = Util.ScaleWithGameTime(speed.X, gameTime);
+            lastMove.Y = Util.ScaleWithGameTime(speed.Y, gameTime);
+
+            Vector2 difference = destination - CenterPoint;
+            if (Math.Abs(difference.X) < lastMove.X && Math.Abs(difference.Y) < lastMove.Y)
+            {
+                this.CenterPoint = destination;
+                return;
+            }
+
+            float angle = (float)Math.Atan2((double)(destination.Y - CenterPoint.Y), (double)(destination.X - CenterPoint.X));
+
+            lastMove.X *= (float)Math.Cos(angle);
+            lastMove.Y *= (float)Math.Sin(angle);
+
+            Position += lastMove;
+
+            if (restrictToScreen)
+            {
+                X = (int)MathHelper.Clamp(X, minX, maxX);
+                Y = (int)MathHelper.Clamp(Y, minY, maxY);
+            }
+        }
+        public void moveTowardsPrecise(Vector2 destination, GameTime gameTime, bool restrictToScreen)
         {
             lastMove.X = Util.ScaleWithGameTime(speed.X, gameTime);
             lastMove.Y = Util.ScaleWithGameTime(speed.Y, gameTime);
@@ -489,20 +654,79 @@ namespace rts
                 PreciseY = MathHelper.Clamp(PreciseY, minY, maxY);
             }
         }
+        public void moveTowardsWeird(Vector2 destination, GameTime gameTime, bool restrictToScreen)
+        {
+            Vector2 difference = destination - new Vector2(CenterPoint.X, CenterPoint.Y);
 
-        // returns true if facing target after turn
+            float ratio = Math.Abs(difference.X) / Math.Abs(difference.Y);
+
+            int moveX = (int)Math.Round(Util.ScaleWithGameTime(speed.X, gameTime));
+            int moveY = (int)Math.Round(Util.ScaleWithGameTime(speed.Y, gameTime));
+
+            if (Math.Abs(difference.X) < moveX && Math.Abs(difference.Y) < moveY)
+            {
+                this.CenterPoint = destination;
+                return;
+            }
+            else if (Math.Abs(difference.X) < moveX)
+            {
+                moveX = 0;
+                if (difference.Y < 0)
+                    moveY = -moveY;
+            }
+            else if (Math.Abs(difference.Y) < moveY)
+            {
+                moveY = 0;
+                if (difference.X < 0)
+                    moveX = -moveX;
+            }
+            else if (ratio > 1.0f)
+            {
+                moveY = (int)MathHelper.Min(moveX / ratio, moveY);
+
+                if (difference.X < 0)
+                    moveX = -moveX;
+                if (difference.Y < 0)
+                    moveY = -moveY;
+            }
+            else if (ratio < 1.0f)
+            {
+                moveX = (int)MathHelper.Min(moveX * ratio, moveX);
+
+                if (difference.X < 0)
+                    moveX = -moveX;
+                if (difference.Y < 0)
+                    moveY = -moveY;
+            }
+            else
+            {
+                if (difference.X < 0)
+                    moveX = -moveX;
+                if (difference.Y < 0)
+                    moveY = -moveY;
+            }
+
+            X += moveX;
+            Y += moveY;
+
+            if (restrictToScreen)
+            {
+                X = (int)MathHelper.Clamp(X, minX, maxX);
+                Y = (int)MathHelper.Clamp(Y, minY, maxY);
+            }
+        }
+
         public bool turnTowards(Vector2 target, float turnSpeed, GameTime gameTime)
         {
             return turnTowards(target, centerPoint, turnSpeed, gameTime);
         }
-        // returns true if facing target after turn
         public bool turnTowards(Vector2 target, Vector2 origin, float turnSpeed, GameTime gameTime)
         {
             float targetAngle = (float)Math.Atan2(target.Y - origin.Y, target.X - origin.X);
 
             if (Rotation == targetAngle)
                 return true;
-            
+
             //float targetX = (float)Math.Cos(targetAngle);
             //float targetY = (float)Math.Sin(targetAngle);
 
@@ -566,7 +790,33 @@ namespace rts
                     screenPosition.Y < 0 - Height || screenPosition.Y > viewport.Height);
             }
         }
-    }
+
+        //public static Object PotentialCollisionsLock = new Object();
+        public List<BaseObject> PotentialCollisions
+        {
+            get
+            {
+                //lock (PotentialCollisionsLock)
+                //{
+                return potentialCollisions;
+                //}
+            }
+        }
+        public void AddPotentialCollision(BaseObject o)
+        {
+            //lock (PotentialCollisions)
+            //{
+            potentialCollisions.Add(o);
+            //}
+        }
+        public void ClearPotentialCollisions()
+        {
+            //lock (PotentialCollisions)
+            //{
+            potentialCollisions.Clear();
+            //}
+        }
+    }*/
 
     /*class BaseObjectPair
     {

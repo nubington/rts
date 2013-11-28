@@ -135,6 +135,8 @@
     <Compile Include="Map\BoundingBox.cs" />
     <Compile Include="Map\MapTile.cs" />
     <Compile Include="misc\Circle.cs" />
+    <Compile Include="old code\old BaseObject.cs" />
+    <Compile Include="old code\old sweeper.cs" />
     <Compile Include="Pathfinding\PathFinderTools.cs" />
     <Compile Include="Pathfinding\PathFindRequest.cs" />
     <Compile Include="Pathfinding\PathNode.cs" />

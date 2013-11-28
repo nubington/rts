@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Lidgren.Network;
 
@@ -17,15 +16,12 @@ namespace rts
         public static List<Unit> units = new List<Unit>();
         public static List<Unit> unitsSorted = new List<Unit>();
         public static List<Unit> DeadUnits = new List<Unit>();
-        //static PotentialCollisionSweeper potentialCollisionSweeper = new PotentialCollisionSweeper(5);
         public static UnitCollisionSweeper UnitCollisionSweeper = new UnitCollisionSweeper();
-        //static UnitWallCollisionSweeper wallCollisionSweeper = new UnitWallCollisionSweeper();
+        public List<BaseObject> potentialCollisions = new List<BaseObject>();
 
         public Texture2D BulletTexture;
         public int BulletSize, BulletSpeed;
         public static Texture2D[] Explosion1Textures;
-
-        //public List<MapTile> NearbyWalls = new List<MapTile>();
 
         public short ID;
         UnitType type;
@@ -36,7 +32,6 @@ namespace rts
         public float Speed { get; protected set; }
         protected float acceleration;
 
-        //public List<Vector2> WayPoints = new List<Vector2>();
         public List<UnitCommand> Commands = new List<UnitCommand>();
         protected Vector2 lastWayPoint, lastMoveDestination;
         //BaseObject followTarget;
@@ -1907,6 +1902,32 @@ namespace rts
             set
             {
             }
+        }
+
+        //public static Object PotentialCollisionsLock = new Object();
+        public List<BaseObject> PotentialCollisions
+        {
+            get
+            {
+                //lock (PotentialCollisionsLock)
+                //{
+                return potentialCollisions;
+                //}
+            }
+        }
+        public void AddPotentialCollision(BaseObject o)
+        {
+            //lock (PotentialCollisions)
+            //{
+            potentialCollisions.Add(o);
+            //}
+        }
+        public void ClearPotentialCollisions()
+        {
+            //lock (PotentialCollisions)
+            //{
+            potentialCollisions.Clear();
+            //}
         }
 
         public override string Name

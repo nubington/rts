@@ -72,7 +72,7 @@ namespace rts
             //float scheduledTime = gameClock + 1f;
 
             // create magic box
-            Rectangle magicBox = units[0];
+            Rectangle magicBox = units[0].Rectangle;
             foreach (Unit unit in units)
             {
                 magicBox = Rectangle.Union(magicBox, unit.Rectangle);
@@ -399,7 +399,7 @@ namespace rts
             List<ScheduledUnitCommand> scheduledUnitCommands = new List<ScheduledUnitCommand>();
 
             // create magic box
-            Rectangle magicBox = units[0];
+            Rectangle magicBox = units[0].Rectangle;
             foreach (Unit unit in units)
                 magicBox = Rectangle.Union(magicBox, unit.Rectangle);
 
@@ -1101,7 +1101,7 @@ namespace rts
             if (SelectedUnits.Count == 0)
                 return;
 
-            Rectangle rectangle = SelectedUnits[0];
+            Rectangle rectangle = SelectedUnits[0].Rectangle;
             foreach (RtsObject o in SelectedUnits)
                 rectangle = Rectangle.Union(rectangle, o.Rectangle);
 
