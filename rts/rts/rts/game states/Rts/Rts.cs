@@ -9,6 +9,7 @@ using System.Windows.Forms;
 //using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using Lidgren.Network;
+using System.Threading;
 
 namespace rts
 {
@@ -151,6 +152,11 @@ namespace rts
 
             Player.Me.Roks = 25;
 
+            initialHandShake();
+        }
+
+        void initialHandShake()
+        {
             if (iAmServer)
             {
                 NetOutgoingMessage msg = netPeer.CreateMessage();
@@ -172,8 +178,11 @@ namespace rts
 
                             break;
                         }
+
                         netPeer.Recycle(m);
                     }
+
+                    Thread.Sleep(1);
                 }
             }
             else
@@ -181,11 +190,13 @@ namespace rts
                 while (true)
                 {
                     NetIncomingMessage msg;
+
                     if ((msg = netPeer.ReadMessage()) != null)
                     {
                         if (msg.MessageType == NetIncomingMessageType.Data)
                         {
                             int id = msg.ReadInt32();
+
                             if (id == 0)
                             {
                                 NetOutgoingMessage m = netPeer.CreateMessage();
@@ -205,20 +216,23 @@ namespace rts
                                 netPeer.Recycle(msg);
                                 break;
                             }
+
                             netPeer.Recycle(msg);
                         }
                     }
+
+                    Thread.Sleep(1);
                 }
             }
 
             connection = netPeer.Connections[0];
 
             // clear incoming messages
-            NetIncomingMessage muh;
+            /*NetIncomingMessage muh;
             while ((muh = netPeer.ReadMessage()) != null)
             {
                 netPeer.Recycle(muh);
-            }
+            }*/
         }
 
         void initializeStartingPoints()

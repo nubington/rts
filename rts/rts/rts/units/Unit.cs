@@ -1506,8 +1506,8 @@ namespace rts
 
             List<PathNode> pathNodesHit = new List<PathNode>();
 
-            //foreach (MapTile tile in CurrentPathNode.Tile.Neighbors)
             foreach (PathNode pathNode in PathNodeBufferSquare)
+            //foreach (PathNode pathNode in OccupiedPathNodes)
             {
                 MapTile tile = pathNode.Tile;
 
