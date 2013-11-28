@@ -87,7 +87,7 @@ namespace rts
                                                 continue;
                                             //if (!PathFinder.Walkable(unit.CenterPoint, Map.Tiles[y, x].CenterPoint, (int)(Vector2.Distance(unit.CenterPoint, Map.Tiles[y, x].CenterPoint) / Map.TileSize)))
                                             //    continue;
-                                            if (!PathFinder.IsTileVisible(unit.CenterPoint, Map.Tiles[y, x].CenterPoint, unit, (int)(Vector2.Distance(unit.CenterPoint, Map.Tiles[y, x].CenterPoint) / Map.TileSize)))
+                                            if (!PathFinder.Tools.IsTileVisible(unit.CenterPoint, Map.Tiles[y, x].CenterPoint, unit, (int)(Vector2.Distance(unit.CenterPoint, Map.Tiles[y, x].CenterPoint) / Map.TileSize)))
                                                 continue;
 
                                             if (myTeam)

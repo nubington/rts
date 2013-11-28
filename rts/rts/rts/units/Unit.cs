@@ -235,7 +235,7 @@ namespace rts
 
             if (stuck)
             {
-                CurrentPathNode = Rts.pathFinder.FindNearestPathNode(CurrentPathNode.Tile.Y, CurrentPathNode.Tile.X);//, this);
+                CurrentPathNode = Rts.pathFinder.Tools.FindNearestPathNode(CurrentPathNode.Tile.Y, CurrentPathNode.Tile.X);//, this);
                 CenterPoint = CurrentPathNode.Tile.CenterPoint;
             }
             /*if (!CurrentPathNode.Tile.Rectangle.Intersects(Rectangle))
@@ -599,7 +599,7 @@ namespace rts
 
                     command.WayPoints = lastMoveCommand.WayPoints;
                     command.WayPoints.Add(command.Destination);
-                    Rts.pathFinder.SmoothPathEnd(command.WayPoints, this);
+                    Rts.pathFinder.Tools.SmoothPathEnd(command.WayPoints, this);
 
                     commandPriority = ((int)Vector2.DistanceSquared(lastMoveCommand.Destination, command.Destination) + (int)Vector2.DistanceSquared(centerPoint, command.Destination)) / 2;
                 }
@@ -861,7 +861,7 @@ namespace rts
             if (timeSinceLastSmoothPath >= smoothPathDelay)
             {
                 timeSinceLastSmoothPath = 0;
-                Rts.pathFinder.SmoothImmediatePath(command.WayPoints, this, centerPoint);
+                Rts.pathFinder.Tools.SmoothImmediatePath(command.WayPoints, this, centerPoint);
             }
         }
 

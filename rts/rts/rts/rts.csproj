@@ -132,8 +132,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="base classes\RtsObject.cs" />
-    <Compile Include="Circle.cs" />
-    <Compile Include="CommandCard.cs" />
+    <Compile Include="misc\Circle.cs" />
+    <Compile Include="Pathfinding\PathFinderTools.cs" />
+    <Compile Include="Pathfinding\PathFindRequest.cs" />
+    <Compile Include="Pathfinding\PathNode.cs" />
+    <Compile Include="UI\CommandCard.cs" />
     <Compile Include="game states\HostLobby.cs" />
     <Compile Include="game states\Rts\Rts Drawing.cs" />
     <Compile Include="game states\Rts\Rts Networking.cs" />
@@ -149,9 +152,9 @@
     <Compile Include="game states\GameState.cs" />
     <Compile Include="game states\Rts\Rts.cs" />
     <Compile Include="Map.cs" />
-    <Compile Include="misc\SimpleButton.cs" />
-    <Compile Include="misc\UnitButton.cs" />
-    <Compile Include="PathFinder.cs" />
+    <Compile Include="UI\SimpleButton.cs" />
+    <Compile Include="UI\UnitButton.cs" />
+    <Compile Include="Pathfinding\PathFinder.cs" />
     <Compile Include="misc\PrimitiveLine.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -164,7 +167,7 @@
     <Compile Include="game states\Rts\Rts Player Actions.cs" />
     <Compile Include="game states\Rts\Rts UI.cs" />
     <Compile Include="ScheduledActions.cs" />
-    <Compile Include="SelectBox.cs" />
+    <Compile Include="UI\SelectBox.cs" />
     <Compile Include="Selection.cs" />
     <Compile Include="Shrinker.cs" />
     <Compile Include="Stats.cs" />
@@ -181,13 +184,6 @@
     <Compile Include="units\UnitType.cs" />
     <Compile Include="units\WorkerNublet.cs" />
     <Compile Include="VisionUpdater.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Game.ico" />
-    <Content Include="GameThumbnail.png" />
-    <Content Include="HumanBarracks.ico" />
-    <Content Include="WC2Gold.ico" />
-    <Content Include="WC2Gold.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\rtsContent\rtsContent.contentproj">
@@ -225,7 +221,10 @@
   <ItemGroup>
     <None Include="rts_TemporaryKey.pfx" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="HumanBarracks.ico" />
+    <Content Include="WC2Gold.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

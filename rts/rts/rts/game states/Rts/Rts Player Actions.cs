@@ -89,11 +89,11 @@ namespace rts
                 {
                     // if mouse position is not in a walkable tile, find nearest walkable tile
                     Vector2 destinationPoint;
-                    if (Rts.pathFinder.IsPointWalkable(mousePosition, unit))
+                    if (Rts.pathFinder.Tools.IsPointWalkable(mousePosition, unit))
                         destinationPoint = mousePosition;
                     else
                         //destinationPoint = map.FindNearestWalkableTile(mousePosition);
-                        destinationPoint = (Rts.pathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), unit)).Tile.CenterPoint;
+                        destinationPoint = (Rts.pathFinder.Tools.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), unit)).Tile.CenterPoint;
 
                     createMoveCommandShrinker(destinationPoint, false);
 
@@ -134,9 +134,9 @@ namespace rts
                 {
                     // if mouse position is not in a walkable tile, find nearest walkable tile
                     Vector2 destinationPoint = unit.CenterPoint + new Vector2(distance * angleX, distance * angleY);
-                    if (!Rts.pathFinder.IsPointWalkable(destinationPoint, unit))
+                    if (!Rts.pathFinder.Tools.IsPointWalkable(destinationPoint, unit))
                         //destinationPoint = map.FindNearestWalkableTile(destinationPoint);
-                        destinationPoint = (Rts.pathFinder.FindNearestPathNode((int)(destinationPoint.Y / map.TileSize), (int)(destinationPoint.X / map.TileSize), unit)).Tile.CenterPoint;
+                        destinationPoint = (Rts.pathFinder.Tools.FindNearestPathNode((int)(destinationPoint.Y / map.TileSize), (int)(destinationPoint.X / map.TileSize), unit)).Tile.CenterPoint;
 
                     createMoveCommandShrinker(destinationPoint, false);
 
@@ -352,10 +352,10 @@ namespace rts
 
 
                     Vector2 rallyPoint;
-                    if (Rts.pathFinder.IsPointWalkable(mousePosition))
+                    if (Rts.pathFinder.Tools.IsPointWalkable(mousePosition))
                         rallyPoint = mousePosition;
                     else
-                        rallyPoint = Rts.pathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), s).Tile.CenterPoint;
+                        rallyPoint = Rts.pathFinder.Tools.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), s).Tile.CenterPoint;
 
                     //s.RallyPoints.Add(new RallyPoint(rallyPoint, null));
                     ScheduledStructureTargetedCommand action = new ScheduledStructureTargetedCommand(currentScheduleTime, s, CommandButtonType.RallyPoint, null, rallyPoint, usingShift);
@@ -413,11 +413,11 @@ namespace rts
                 {
                     // if mouse position is not in a walkable tile, find nearest walkable tile
                     Vector2 destinationPoint;
-                    if (Rts.pathFinder.IsPointWalkable(mousePosition, unit))
+                    if (Rts.pathFinder.Tools.IsPointWalkable(mousePosition, unit))
                         destinationPoint = mousePosition;
                     else
                         //destinationPoint = map.FindNearestWalkableTile(mousePosition);\
-                        destinationPoint = (Rts.pathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), unit)).Tile.CenterPoint;
+                        destinationPoint = (Rts.pathFinder.Tools.FindNearestPathNode((int)(mousePosition.Y / map.TileSize), (int)(mousePosition.X / map.TileSize), unit)).Tile.CenterPoint;
 
                     createMoveCommandShrinker(destinationPoint, true);
 
@@ -455,9 +455,9 @@ namespace rts
                 {
                     // if mouse position is not in a walkable tile, find nearest walkable tile
                     Vector2 destinationPoint = unit.CenterPoint + new Vector2(distance * angleX, distance * angleY);
-                    if (!Rts.pathFinder.IsPointWalkable(destinationPoint, unit))
+                    if (!Rts.pathFinder.Tools.IsPointWalkable(destinationPoint, unit))
                         //destinationPoint = map.FindNearestWalkableTile(destinationPoint);
-                        destinationPoint = (Rts.pathFinder.FindNearestPathNode((int)(destinationPoint.Y / map.TileSize), (int)(destinationPoint.X / map.TileSize), unit)).Tile.CenterPoint;
+                        destinationPoint = (Rts.pathFinder.Tools.FindNearestPathNode((int)(destinationPoint.Y / map.TileSize), (int)(destinationPoint.X / map.TileSize), unit)).Tile.CenterPoint;
 
                     createMoveCommandShrinker(destinationPoint, true);
 
@@ -727,10 +727,10 @@ namespace rts
                             else
                             {
                                 Vector2 destinationPoint;
-                                if (Rts.pathFinder.IsPointWalkable(mousePosition, unit))
+                                if (Rts.pathFinder.Tools.IsPointWalkable(mousePosition, unit))
                                     destinationPoint = mousePosition;
                                 else
-                                    destinationPoint = (Rts.pathFinder.FindNearestPathNode((int)(mousePosition.Y / map.TileSize),
+                                    destinationPoint = (Rts.pathFinder.Tools.FindNearestPathNode((int)(mousePosition.Y / map.TileSize),
                                         (int)(mousePosition.X / map.TileSize), unit)).Tile.CenterPoint;
 
                                 /*if (!usingShift)

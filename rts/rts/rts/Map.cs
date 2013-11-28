@@ -42,7 +42,11 @@ namespace rts
 
             tiles = new MapTile[height, width];
 
-            for (int i = 1; i < height + 1; i++)
+            int endOfTileLines = height,
+                endOfResourceLines = endOfTileLines + numberOfResources,
+                endOfStartingPointLines = endOfResourceLines + numberOfStartingPoints;
+
+            for (int i = 1; i <= endOfTileLines; i++)
             {
                 string[] rowOfTiles = lines[i].Split(' ');
 
@@ -56,14 +60,14 @@ namespace rts
                 }
             }
 
-            for (int i = height + 1; i < height + 1 + numberOfResources; i++)
+            for (int i = endOfTileLines + 1; i <= endOfResourceLines; i++)
             {
                 string[] resourceParams = lines[i].Split(' ');
 
                 resources.Add(new KeyValuePair<Point, int>(new Point(int.Parse(resourceParams[1]), int.Parse(resourceParams[2])), int.Parse(resourceParams[0])));
             }
 
-            for (int i = height + 1 + numberOfResources; i < height + 1 + numberOfResources + numberOfStartingPoints; i++)
+            for (int i = endOfResourceLines + 1; i <= endOfStartingPointLines; i++)
             {
                 string[] resourceParams = lines[i].Split(' ');
 

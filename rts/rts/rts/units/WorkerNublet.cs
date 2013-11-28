@@ -47,7 +47,7 @@ namespace rts
 
         void moveToBuildLocation(BuildStructureCommand command, GameTime gameTime)
         {
-            if (!Rts.pathFinder.WillStructureFit(command.StructureLocation, command.StructureType.Size, command.StructureType.CutCorners))
+            if (!Rts.pathFinder.Tools.WillStructureFit(command.StructureLocation, command.StructureType.Size, command.StructureType.CutCorners))
             {
                 NextCommand();
                 return;
@@ -121,7 +121,7 @@ namespace rts
 
         bool buildStructure(BuildStructureCommand command)
         {
-            bool allowBuild = Rts.pathFinder.CanStructureBePlaced(command.StructureLocation, command.StructureType.Size, this, command.StructureType.CutCorners);
+            bool allowBuild = Rts.pathFinder.Tools.CanStructureBePlaced(command.StructureLocation, command.StructureType.Size, this, command.StructureType.CutCorners);
 
             if (allowBuild)
             {
@@ -461,7 +461,7 @@ namespace rts
                     return;
                 }
 
-                if (townHall != command.TargetStructure && Rts.pathFinder.IsStructureInLineOfSight(this, townHall))
+                if (townHall != command.TargetStructure && Rts.pathFinder.Tools.IsStructureInLineOfSight(this, townHall))
                 {
                     //command.TargetStructure = townHall;
                     //PathFinder.AddHighPriorityPathFindRequest(this, command, CurrentPathNode, 1, false);

@@ -166,7 +166,7 @@ namespace rts
         void createMoveCommandShrinker(Vector2 position, bool attackMove)
         {
             Shrinker moveCommandThing;
-            if (Rts.pathFinder.IsPointWalkable(position))
+            if (Rts.pathFinder.Tools.IsPointWalkable(position))
                 moveCommandThing = new Shrinker(position - new Vector2(moveCommandShrinkerSize / 2f, moveCommandShrinkerSize / 2f), moveCommandShrinkerSize, moveCommandShrinkDelay);
             else
                 moveCommandThing = new Shrinker(map.FindNearestWalkableTile(position) - new Vector2(moveCommandShrinkerSize / 2f, moveCommandShrinkerSize / 2f), moveCommandShrinkerSize, moveCommandShrinkDelay);
