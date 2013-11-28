@@ -135,9 +135,10 @@ namespace rts
                         {
                             short unitID = msg.ReadInt16();
                             Unit unit = Player.Players[team].UnitArray[unitID];
-                            if (unit != null)
+                            Vector2 destination = new Vector2(msg.ReadFloat(), msg.ReadFloat());
+                            //if (unit != null)
                             {
-                                MoveCommand moveCommand = new MoveCommand(unit, new Vector2(msg.ReadFloat(), msg.ReadFloat()), 1);
+                                MoveCommand moveCommand = new MoveCommand(unit, destination, 1);
                                 Player.Players[team].ScheduledActions.Add(new ScheduledUnitCommand(scheduledTime, moveCommand, queued));
                                 //Rts.pathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
                             }

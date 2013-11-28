@@ -37,16 +37,13 @@ namespace rts
 
         void initializePathNodes()
         {
-            // create path nodes for every walkable tile
+            // create path nodes for every tile
             PathNodes = new PathNode[Map.Height, Map.Width];
             for (int i = 0; i < Map.Height; i++)
             {
                 for (int s = 0; s < Map.Width; s++)
                 {
-                    //if (Map.Tiles[i, s].Walkable)
-                    //{
                     PathNodes[i, s] = new PathNode(Map.Tiles[i, s]);
-                    //}
                 }
             }
 
@@ -633,8 +630,8 @@ namespace rts
 
 
         //************************************************************************************
+
         // thread stuff
-        //************************************************************************************
 
         public void SuspendThread()
         {

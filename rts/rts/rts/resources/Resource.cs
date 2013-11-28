@@ -233,7 +233,8 @@ namespace rts
                     if (y < 0 || y > Rts.map.Height - 1)
                         continue;
 
-                    if (Rts.pathFinder.PathNodes[y, x].Tile.Walkable && !Rts.pathFinder.PathNodes[y, x].Blocked)
+                    PathNode pathNode = Rts.pathFinder.PathNodes[y, x];
+                    if (pathNode.Tile.Walkable && !pathNode.Blocked)
                         exitPathNodes.Add(Rts.pathFinder.PathNodes[y, x]);
                 }
             }
