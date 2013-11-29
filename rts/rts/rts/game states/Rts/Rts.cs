@@ -17,6 +17,7 @@ namespace rts
     {
         public static float GameSpeed = 2.5f;
         public static float MusicVolume = 0f;//.2f;
+        public const float COUNTDOWN_TIME = 10f;
 
         public static GameTime gameTime;
 
@@ -152,6 +153,8 @@ namespace rts
 
             Player.Me.Roks = 25;
 
+            clampCameraToMap();
+
             initialHandShake();
         }
 
@@ -234,6 +237,12 @@ namespace rts
             connection = netPeer.Connections[0];
 
             // clear incoming messages
+            clearMessages();
+        }
+
+        // clear incoming messages
+        void clearMessages()
+        {
             NetIncomingMessage muh;
             while ((muh = netPeer.ReadMessage()) != null)
             {
@@ -271,50 +280,8 @@ namespace rts
             gameClock += (float)gameTime.ElapsedGameTime.TotalSeconds * GameSpeed;
 
             // count down
-            if (countingDown)
-            {
-                countDownTime -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (countDownTime <= 0f)
-                {
-                    countingDown = false;
-                    gameClock = 0f;
-                }
-                else
-                {
-                    if (iAmServer)
-                    {
-                        //NetOutgoingMessage msg = netPeer.CreateMessage();
-                        //msg.Write(countDownTime);
-                        //netPeer.SendMessage(msg, connection, NetDeliveryMethod.UnreliableSequenced, 0);
-                        if (gameClock <= 3f)
-                            checkToSync(gameTime);
-                    }
-                    else
-                    {
-                        NetIncomingMessage msg;
-                        if ((msg = netPeer.ReadMessage()) != null)
-                        {
-                            if (msg.MessageType == NetIncomingMessageType.Data)
-                            {
-                                if (msg.ReadByte() == MessageID.SYNC && countingDown)
-                                {
-                                    gameClock = msg.ReadFloat() + connection.AverageRoundtripTime / 2f;
-                                    countDownTime = 4f - gameClock;
-
-                                    if (countDownTime <= 0f)
-                                    {
-                                        countingDown = false;
-                                        gameClock = 0f;
-                                    }
-                                }
-                                //countDownTime = msg.ReadFloat() - connection.AverageRoundtripTime / 2f;
-                            }
-                        }
-                    }
-                    return;
-                }
-            }
+            if (doCountDown())
+                return;
 
             if (waitingForMessage)
             {
@@ -500,6 +467,59 @@ namespace rts
             clampCameraToMap();
         }
 
+        // returns true if still counting down
+        bool doCountDown()
+        {
+            if (!countingDown)
+                return false;
+
+            countDownTime -= (float)gameTime.ElapsedGameTime.TotalSeconds * Rts.GameSpeed;
+
+            if (countDownTime <= 0f)
+            {
+                countingDown = false;
+                gameClock = 0f;
+                //clearMessages();
+                return false;
+            }
+            else
+            {
+                if (iAmServer)
+                {
+                    //NetOutgoingMessage msg = netPeer.CreateMessage();
+                    //msg.Write(countDownTime);
+                    //netPeer.SendMessage(msg, connection, NetDeliveryMethod.UnreliableSequenced, 0);
+                    //if (gameClock <= COUNTDOWN_TIME)
+                    countDownSync(gameTime);
+                }
+                else
+                {
+                    NetIncomingMessage msg;
+                    if ((msg = netPeer.ReadMessage()) != null)
+                    {
+                        if (msg.MessageType == NetIncomingMessageType.Data)
+                        {
+                            if (msg.ReadByte() == MessageID.SYNC && countingDown)
+                            {
+                                gameClock = msg.ReadFloat() + connection.AverageRoundtripTime / 2f;
+                                countDownTime = COUNTDOWN_TIME - gameClock;
+
+                                if (countDownTime <= 0f)
+                                {
+                                    countingDown = false;
+                                    gameClock = 0f;
+                                    //clearMessages();
+                                    return false;
+                                }
+                            }
+                            //countDownTime = msg.ReadFloat() - connection.AverageRoundtripTime / 2f;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+
         void cleanup()
         {
             Unit.UnitCollisionSweeper.Thread.Abort();
@@ -632,6 +652,21 @@ namespace rts
                     {
                         revealBoundingBoxCounter = 0;
                         tile.BoundingBox.Revealed = true;
+                    }
+                }
+            }
+
+            // apply visibility to resources
+            foreach (Resource resource in Resource.Resources)
+            {
+                resource.Visible = false;
+
+                foreach (PathNode pathNode in resource.OccupiedPathNodes)
+                {
+                    if (pathNode.Tile.Visible)
+                    {
+                        resource.Visible = true;
+                        break;
                     }
                 }
             }

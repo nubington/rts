@@ -77,6 +77,282 @@ namespace rts
             drawStructures(spriteBatch);
 
             // placing structure
+            drawPlacingStructure(spriteBatch);
+
+            // cog wheels
+            drawCogWheels(spriteBatch);
+
+            // draw units
+            drawUnits(spriteBatch);
+
+            // draw rings around units
+            drawSelectionRings(spriteBatch);
+
+            // draw cargo on workers
+            drawCargoOnUnits(spriteBatch);
+
+            // draw rally points
+            drawRallyPoints(spriteBatch);
+
+            // placed structures
+            drawPlacedStructures(spriteBatch);
+
+            // hp and other bars
+            drawHpAndOtherBars(spriteBatch);
+
+            // unit animations
+            drawUnitAnimations(spriteBatch);
+
+            drawWayPoints(spriteBatch);
+
+            drawDebugStuff(spriteBatch);
+
+            // bullets
+            drawBullets(spriteBatch);
+
+            // move command shrinker things
+            drawShrinkers(spriteBatch);
+
+            spriteBatch.End();
+            spriteBatch.Begin();
+
+            GraphicsDevice.Viewport = uiViewport;
+
+            //drawBars(spriteBatch);
+
+            SelectBox.Draw(spriteBatch, camera);
+
+            drawSelectionInfoArea(spriteBatch);
+            drawCommandCardArea(spriteBatch);
+            drawCommandCardBorder(spriteBatch);
+
+            drawResourceCounts(spriteBatch);
+
+            //pause and fps count
+            Vector2 pauseStringSize = pauseFont.MeasureString("PAUSED");
+            if (paused)
+                spriteBatch.DrawString(pauseFont, "PAUSED", new Vector2(uiViewport.Width / 2 - pauseStringSize.X / 2, uiViewport.Height / 2 - pauseStringSize.Y / 2), Color.White);
+            else
+                frameCounter++;
+
+            // fps message
+            spriteBatch.DrawString(fpsFont, fpsMessage, new Vector2(8, 5), Color.Black);
+
+            /*spriteBatch.Draw(buttonTexture, button1, Color.White);
+            Vector2 button1TextSize = fpsFont.MeasureString("1");
+            spriteBatch.DrawString(fpsFont, "1", new Vector2((int)(button1.X + button1.Width / 2 - button1TextSize.X / 2), (int)(button1.Y + button1.Height / 2 - button1TextSize.Y / 2)), Color.White);
+            */
+            spriteBatch.Draw(buttonTexture, button2.Rectangle, Color.White);
+            Vector2 button2TextSize = fpsFont.MeasureString("10");
+            spriteBatch.DrawString(fpsFont, "10", new Vector2((int)(button2.X + button2.Width / 2 - button2TextSize.X / 2), (int)(button2.Y + button2.Height / 2 - button2TextSize.Y / 2)), Color.White);
+            /*spriteBatch.Draw(buttonTexture, button3, Color.White);
+            Vector2 button3TextSize = fpsFont.MeasureString("FS");
+            spriteBatch.DrawString(fpsFont, "FS", new Vector2((int)(button3.X + button3.Width / 2 - button3TextSize.X / 2), (int)(button3.Y + button3.Height / 2 - button3TextSize.Y / 2)), Color.White);
+            spriteBatch.Draw(buttonTexture, button4, Color.White);
+            Vector2 button4TextSize = fpsFont.MeasureString("M");
+            spriteBatch.DrawString(fpsFont, "M", new Vector2((int)(button4.X + button4.Width / 2 - button4TextSize.X / 2), (int)(button4.Y + button4.Height / 2 - button4TextSize.Y / 2)), Color.White);
+            spriteBatch.Draw(buttonTexture, button5, Color.White);
+            Vector2 button5TextSize = fpsFont.MeasureString("X");
+            spriteBatch.DrawString(fpsFont, "X", new Vector2((int)(button5.X + button5.Width / 2 - button5TextSize.X / 2), (int)(button5.Y + button5.Height / 2 - button5TextSize.Y / 2)), Color.White);
+            */
+            // cursor
+            /*if (usingAttackCommand)
+                spriteBatch.Draw(attackCommandCursorTexture, new Rectangle(mouseState.X - attackCommandCursorSize / 2, mouseState.Y - attackCommandCursorSize / 2, attackCommandCursorSize, attackCommandCursorSize), Color.White);
+            else
+                spriteBatch.Draw(normalCursorTexture, new Rectangle(mouseState.X, mouseState.Y, attackCommandCursorSize, attackCommandCursorSize), Color.White);*/
+
+            drawSpecialMessages(spriteBatch);
+
+            drawGameClock(spriteBatch);
+
+            spriteBatch.End();
+
+            GraphicsDevice.Viewport = minimapViewport;
+            //Matrix transform = camera.get_transformation(minimapViewport);
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, camera.get_minimap_transformation(minimapViewport));
+
+            drawMinimap(spriteBatch);
+
+            spriteBatch.End();
+            GraphicsDevice.Viewport = uiViewport;
+        }
+
+        void drawUnits(SpriteBatch spriteBatch)
+        {
+            foreach (Unit unit in Unit.Units)
+            {
+                //if (unit.CurrentPathNode.Tile.Visible)
+                //if (unit.Visible)
+                {
+                    //if (!SelectingUnits.Contains(unit) && !SelectedUnits.Contains(unit))
+                    {
+                        spriteBatch.Draw(unit.Texture, new Rectangle((int)unit.CenterPoint.X, (int)unit.CenterPoint.Y, unit.Width, unit.Height), null, Color.White, unit.Rotation, unit.TextureCenterOrigin, SpriteEffects.None, 0f);
+                    }
+
+                    /*int teamIndicatorSize = (int)(unit.Diameter / 4);
+                    // Rectangle teamIndicator = new Rectangle((int)(unit.CenterPoint.X - teamIndicatorSize / 2), (int)(unit.CenterPoint.Y - teamIndicatorSize / 2), teamIndicatorSize, teamIndicatorSize);
+                    Rectangle teamIndicator = new Rectangle((int)unit.CenterPoint.X, (int)unit.CenterPoint.Y, teamIndicatorSize, teamIndicatorSize);
+
+                    if (unit.Team == myTeam)
+                        spriteBatch.Draw(ColorTexture.Green, teamIndicator, null, Color.White, unit.Rotation, ColorTexture.CenterVector, SpriteEffects.None, 0f);
+                    else
+                        spriteBatch.Draw(ColorTexture.Red, teamIndicator, null, Color.White, unit.Rotation, ColorTexture.CenterVector, SpriteEffects.None, 0f);*/
+
+                    if (unit.Team == Player.Me.Team)
+                        spriteBatch.Draw(greenTeamIndicatorTexture, new Rectangle((int)unit.CenterPoint.X, (int)unit.CenterPoint.Y, unit.Width, unit.Height), null, Color.White, unit.Rotation, new Vector2(greenTeamIndicatorTexture.Width / 2, greenTeamIndicatorTexture.Height / 2), SpriteEffects.None, 0f);
+                    else
+                        spriteBatch.Draw(redTeamIndicatorTexture, new Rectangle((int)unit.CenterPoint.X, (int)unit.CenterPoint.Y, unit.Width, unit.Height), null, Color.White, unit.Rotation, new Vector2(redTeamIndicatorTexture.Width / 2, redTeamIndicatorTexture.Height / 2), SpriteEffects.None, 0f);
+
+                    /*line.Colour = Color.Yellow;
+                    line.ClearVectors();
+                    float incrementRadians = MathHelper.TwoPi / 32f;
+                    for (float r = 0f; r <= MathHelper.TwoPi; r += incrementRadians)
+                    {
+                        line.AddVector(new Vector2(unit.CenterPointX + (unit.AttackRange + unit.Radius) * (float)Math.Cos(r), unit.CenterPointY + (unit.AttackRange + unit.Radius) * (float)Math.Sin(r)));
+                    }
+                    line.AddVector(new Vector2(unit.CenterPointX + unit.AttackRange + unit.Radius, unit.CenterPointY));
+                    line.Render(spriteBatch);*/
+
+                    /*line.Colour = Color.Black;
+                    lock (unit.PotentialCollisions)
+                    {
+                        foreach (Unit u in unit.PotentialCollisions)
+                        {
+                            line.ClearVectors();
+                            line.AddVector(unit.CenterPoint);
+                            line.AddVector(u.CenterPoint);
+                            line.Render(spriteBatch);
+                        }
+                    }*/
+                }
+                //else
+                //{
+                //spriteBatch.Draw(ColorTexture.Red, new Rectangle((int)(unit.CenterPoint.X - 1), (int)(unit.CenterPoint.Y - 1), 2, 2), Color.White);
+                //}
+                // red dot showing X and Y location of unit
+                //spriteBatch.Draw(ColorTexture.Red, new Rectangle((int)(unit.X - 1), (int)(unit.Y - 1), 2, 2), Color.White);
+            }
+        }
+
+        void drawStructures(SpriteBatch spriteBatch)
+        {
+            foreach (Structure structure in Structure.Structures)
+            {
+                if (structure.Visible || !structure.Visible)
+                {
+                    // draw team color indicator
+                    Rectangle teamIndicator = new Rectangle();
+                    teamIndicator.Width = (int)(structure.Rectangle.Width * .4f);
+                    teamIndicator.Height = (int)(structure.Rectangle.Height * .4f);
+                    teamIndicator.Location = new Point((int)(structure.CenterPointX - teamIndicator.Width / 2), (int)(structure.CenterPointY - teamIndicator.Height / 2));
+                    if (structure.Team == Player.Me.Team)
+                        spriteBatch.Draw(ColorTexture.Green, teamIndicator, Color.White);
+                    else
+                        spriteBatch.Draw(ColorTexture.Red, teamIndicator, Color.White);
+
+                    // draw structure
+                    //spriteBatch.Draw(structure.Texture, structure.Rectangle, Color.White);
+                    spriteBatch.Draw(structure.Texture, new Rectangle((int)structure.CenterPoint.X, (int)structure.CenterPoint.Y, structure.Width, structure.Height), null, Color.White, -camera.Rotation, structure.TextureCenterOrigin, SpriteEffects.None, 0f);
+                }
+                else if (structure.Revealed)
+                {
+                    //spriteBatch.Draw(ColorTexture.Red, new Rectangle((int)(structure.CenterPoint.X - 1), (int)(structure.CenterPoint.Y - 1), 2, 2), Color.White);
+
+                    Rectangle teamIndicator = new Rectangle();
+                    teamIndicator.Width = (int)(structure.Rectangle.Width * .4f);
+                    teamIndicator.Height = (int)(structure.Rectangle.Height * .4f);
+                    teamIndicator.Location = new Point((int)(structure.CenterPointX - teamIndicator.Width / 2), (int)(structure.CenterPointY - teamIndicator.Height / 2));
+                    //if (structure.Team == myTeam)
+                    //spriteBatch.Draw(ColorTexture.Green, teamIndicator, Color.White * .5f);
+                    // else
+                    //    spriteBatch.Draw(ColorTexture.Red, teamIndicator, Color.White * .5f);
+
+                    // draw structure
+                    //spriteBatch.Draw(structure.Texture, structure.Rectangle, Color.White * .9f);
+                    spriteBatch.Draw(structure.Texture, new Rectangle((int)structure.CenterPoint.X, (int)structure.CenterPoint.Y, structure.Width, structure.Height), null, Color.White * .9f, -camera.Rotation, structure.TextureCenterOrigin, SpriteEffects.None, 0f);
+                }
+            }
+        }
+
+        void drawResources(SpriteBatch spriteBatch)
+        {
+            foreach (Resource resource in Resource.Resources)
+            {
+                //float alpha = 1f;
+                //if (resource.Depleted)
+                //    alpha = .5f;
+
+                //spriteBatch.Draw(resource.Texture, resource.Rectangle, Color.White);
+                spriteBatch.Draw(resource.Texture, new Rectangle((int)resource.CenterPoint.X, (int)resource.CenterPoint.Y, resource.Width, resource.Height), null, Color.White, -camera.Rotation, resource.TextureCenterOrigin, SpriteEffects.None, 0f);
+
+                if (resource.Visible)
+                {
+                    string s = resource.Amount.ToString();
+                    Vector2 stringSize = unitInfoUnitNameFont.MeasureString(s);
+                    //spriteBatch.DrawString(unitInfoUnitNameFont, s, new Vector2(resource.Rectangle.X + resource.Rectangle.Width / 2 - stringSize.X / 2, resource.Rectangle.Y + resource.Rectangle.Height / 2 - stringSize.Y / 2), Color.Black, -camera.Rotation, new Vector2(stringSize.X / 4, stringSize.Y / 4), 1f, SpriteEffects.None, 0f);
+
+                    spriteBatch.DrawString(unitInfoUnitNameFont, s, resource.CenterPoint, Color.Black, -camera.Rotation, new Vector2(stringSize.X / 2, stringSize.Y / 2), 1f, SpriteEffects.None, 0f);
+                }
+                /*Roks roks = resource as Roks;
+                if (roks != null)
+                {
+                    foreach (PathNode pathNode in roks.exitPathNodes)
+                    {
+                        line.ClearVectors();
+                        line.AddVector(new Vector2(pathNode.Tile.Rectangle.X, pathNode.Tile.Rectangle.Y));
+                        line.AddVector(new Vector2(pathNode.Tile.Rectangle.X + pathNode.Tile.Width, pathNode.Tile.Rectangle.Y));
+                        line.AddVector(new Vector2(pathNode.Tile.Rectangle.X + pathNode.Tile.Width, pathNode.Tile.Rectangle.Y + pathNode.Tile.Rectangle.Height));
+                        line.AddVector(new Vector2(pathNode.Tile.Rectangle.X, pathNode.Tile.Rectangle.Y + pathNode.Tile.Rectangle.Height));
+                        line.AddVector(new Vector2(pathNode.Tile.Rectangle.X, pathNode.Tile.Rectangle.Y));
+                        line.Render(spriteBatch);
+                    }
+                }*/
+            }
+        }
+
+        void drawWayPoints(SpriteBatch spriteBatch)
+        {
+            //foreach (RtsObject o in SelectedUnits)
+            foreach (Unit unit in Unit.Units)
+            {
+                //Unit unit = o as Unit;
+
+                //if (unit != null && unit.IsMoving && unit.Commands.Count > 1 && unit.Commands[1] is MoveCommand)
+                if (unit != null && unit.IsMoving)
+                {
+                    line.ClearVectors();
+                    //line.Alpha = .6f;
+                    line.AddVector(unit.CenterPoint);
+                    //foreach (Vector2 v in unit.WayPoints)
+                    //    line.AddVector(v);
+                    foreach (UnitCommand command in unit.Commands)
+                    {
+                        MoveCommand moveCommand = command as MoveCommand;
+
+                        if (moveCommand == null)
+                            continue;
+
+                        if (moveCommand is AttackCommand)
+                            line.Colour = Color.Red * .85f;
+                        else
+                            line.Colour = Color.Green * .85f;
+
+                        foreach (Vector2 v in moveCommand.WayPoints)
+                            line.AddVector(v);
+
+                        line.RenderWithZoom(spriteBatch, camera.Zoom);
+                        line.ClearVectors();
+                        line.AddVector(moveCommand.Destination);
+                    }
+
+                    line.Alpha = .75f;
+                }
+            }
+        }
+
+        void drawPlacingStructure(SpriteBatch spriteBatch)
+        {
             if (placingStructure)
             {
                 line.Colour = Color.Beige;
@@ -131,52 +407,49 @@ namespace rts
                     line.RenderWithZoom(spriteBatch, camera.Zoom);
                 }
             }
+        }
 
-            // cog wheels
+        void drawCogWheels(SpriteBatch spriteBatch)
+        {
             foreach (StructureCogWheel cog in CogWheels)
             {
                 if (cog.Structure.Visible)
                     spriteBatch.Draw(cogWheelTexture, cog.Rectangle, null, Color.White, cog.Rotation, new Vector2(cogWheelTexture.Width / 2f, cogWheelTexture.Height / 2f), SpriteEffects.None, 0f);
             }
+        }
 
-            // draw units
-            drawUnits(spriteBatch);
-
-            // draw rings around units
+        void drawSelectionRings(SpriteBatch spriteBatch)
+        {
             foreach (RtsObject o in SelectingUnits)
                 //drawSelectionRing(unit, spriteBatch, Color.Green);
                 drawSelectingRing(o, spriteBatch);
             foreach (RtsObject o in SelectedUnits)
                 //drawSelectionRing(unit, spriteBatch, Color.Khaki);
                 drawSelectedRing(o, spriteBatch);
+        }
 
-            // draw cargo on workers
-            drawCargoOnUnits(spriteBatch);
-
-            // draw rally points
-            drawRallyPoints(spriteBatch);
-
-            // placed structures
+        void drawPlacedStructures(SpriteBatch spriteBatch)
+        {
             foreach (PlacedStructure link in placedStructures)
             {
                 //spriteBatch.Draw(link.Object1.PlacingTexture, link.Object2, Color.LightGreen * .5f);
                 if (link.Team == Player.Me.Team)
                     spriteBatch.Draw(link.Object1.PlacingTexture, new Rectangle(link.Object2.X + link.Object2.Width / 2, link.Object2.Y + link.Object2.Height / 2, link.Object2.Width, link.Object2.Height), null, Color.LightGreen * .5f, -camera.Rotation, new Vector2(link.Object1.PlacingTexture.Width / 2, link.Object1.PlacingTexture.Height / 2), SpriteEffects.None, 0f);
             }
+        }
 
-            // hp and other bars
-            drawHpAndOtherBars(spriteBatch);
-
-            // unit animations
+        void drawUnitAnimations(SpriteBatch spriteBatch)
+        {
             foreach (UnitAnimation a in UnitAnimation.UnitAnimations)
             {
                 // only draw if visible
                 if (a.Unit.Visible)
                     spriteBatch.Draw(a, new Rectangle(a.Rectangle.Center.X, a.Rectangle.Center.Y, a.Rectangle.Width, a.Rectangle.Height), null, Color.White, a.Rotation, new Vector2(((Texture2D)a).Width / 2, ((Texture2D)a).Height / 2), SpriteEffects.None, 0f);
             }
+        }
 
-            drawWayPoints(spriteBatch);
-
+        void drawDebugStuff(SpriteBatch spriteBatch)
+        {
             if (SelectedUnits.Count == 1)
             {
                 Unit unit = SelectedUnits[0] as Unit;
@@ -324,7 +597,18 @@ namespace rts
                 }
             }*/
 
-            // bullets
+            // all bounding boxes
+            /*line.Colour = Color.Black;
+            foreach (BoundingBox box in map.BigBoundingBoxes)
+            {
+                line.ClearVectors();
+                line.CreateBox(box.Rectangle);
+                line.Render(spriteBatch);
+            }*/
+        }
+
+        void drawBullets(SpriteBatch spriteBatch)
+        {
             foreach (RtsBullet b in RtsBullet.RtsBullets)
             {
                 // find tile the bullet is in
@@ -339,172 +623,13 @@ namespace rts
                     //spriteBatch.Draw(b.Texture, new Rectangle((int)b.CenterPoint.X, (int)b.CenterPoint.Y, b.Width, b.Height), null, Color.Black * .4f, b.Rotation, b.TextureCenterOrigin, SpriteEffects.None, 0f);
                 }
             }
+        }
 
-            // move command shrinker things
+        void drawShrinkers(SpriteBatch spriteBatch)
+        {
             foreach (Shrinker shrinker in Shrinker.Shrinkers)
                 spriteBatch.Draw(shrinker.Texture, shrinker.Rectangle, Color.White);
             //spriteBatch.Draw(shrinker.Texture, new Rectangle((int)shrinker.CenterPoint.X, (int)shrinker.CenterPoint.Y, shrinker.Width, shrinker.Height), null, Color.White, shrinker.Rotation, shrinker.TextureCenterOrigin, SpriteEffects.None, 0f);
-
-            // all bounding boxes
-            /*line.Colour = Color.Black;
-            foreach (BoundingBox box in map.BigBoundingBoxes)
-            {
-                line.ClearVectors();
-                line.CreateBox(box.Rectangle);
-                line.Render(spriteBatch);
-            }*/
-
-            spriteBatch.End();
-            spriteBatch.Begin();
-
-            GraphicsDevice.Viewport = uiViewport;
-
-            //drawBars(spriteBatch);
-
-            SelectBox.Draw(spriteBatch, camera);
-
-            drawSelectionInfoArea(spriteBatch);
-            drawCommandCardArea(spriteBatch);
-            drawCommandCardBorder(spriteBatch);
-
-            drawResourceCounts(spriteBatch);
-
-            //pause and fps count
-            Vector2 pauseStringSize = pauseFont.MeasureString("PAUSED");
-            if (paused)
-                spriteBatch.DrawString(pauseFont, "PAUSED", new Vector2(uiViewport.Width / 2 - pauseStringSize.X / 2, uiViewport.Height / 2 - pauseStringSize.Y / 2), Color.White);
-            else
-                frameCounter++;
-
-            // fps message
-            spriteBatch.DrawString(fpsFont, fpsMessage, new Vector2(8, 5), Color.Black);
-
-            /*spriteBatch.Draw(buttonTexture, button1, Color.White);
-            Vector2 button1TextSize = fpsFont.MeasureString("1");
-            spriteBatch.DrawString(fpsFont, "1", new Vector2((int)(button1.X + button1.Width / 2 - button1TextSize.X / 2), (int)(button1.Y + button1.Height / 2 - button1TextSize.Y / 2)), Color.White);
-            */
-            spriteBatch.Draw(buttonTexture, button2.Rectangle, Color.White);
-            Vector2 button2TextSize = fpsFont.MeasureString("10");
-            spriteBatch.DrawString(fpsFont, "10", new Vector2((int)(button2.X + button2.Width / 2 - button2TextSize.X / 2), (int)(button2.Y + button2.Height / 2 - button2TextSize.Y / 2)), Color.White);
-            /*spriteBatch.Draw(buttonTexture, button3, Color.White);
-            Vector2 button3TextSize = fpsFont.MeasureString("FS");
-            spriteBatch.DrawString(fpsFont, "FS", new Vector2((int)(button3.X + button3.Width / 2 - button3TextSize.X / 2), (int)(button3.Y + button3.Height / 2 - button3TextSize.Y / 2)), Color.White);
-            spriteBatch.Draw(buttonTexture, button4, Color.White);
-            Vector2 button4TextSize = fpsFont.MeasureString("M");
-            spriteBatch.DrawString(fpsFont, "M", new Vector2((int)(button4.X + button4.Width / 2 - button4TextSize.X / 2), (int)(button4.Y + button4.Height / 2 - button4TextSize.Y / 2)), Color.White);
-            spriteBatch.Draw(buttonTexture, button5, Color.White);
-            Vector2 button5TextSize = fpsFont.MeasureString("X");
-            spriteBatch.DrawString(fpsFont, "X", new Vector2((int)(button5.X + button5.Width / 2 - button5TextSize.X / 2), (int)(button5.Y + button5.Height / 2 - button5TextSize.Y / 2)), Color.White);
-            */
-            // cursor
-            /*if (usingAttackCommand)
-                spriteBatch.Draw(attackCommandCursorTexture, new Rectangle(mouseState.X - attackCommandCursorSize / 2, mouseState.Y - attackCommandCursorSize / 2, attackCommandCursorSize, attackCommandCursorSize), Color.White);
-            else
-                spriteBatch.Draw(normalCursorTexture, new Rectangle(mouseState.X, mouseState.Y, attackCommandCursorSize, attackCommandCursorSize), Color.White);*/
-
-            if (countingDown)
-            {
-                string str = countDownTime.ToString("0") + "...";
-                Vector2 strSize = bigFont.MeasureString(str);
-                spriteBatch.DrawString(bigFont, str, new Vector2(uiViewport.Width / 2 - strSize.X / 2, uiViewport.Height / 2 - strSize.Y / 2), Color.White);
-            }
-
-            if (waitingForMessage)
-            {
-                string str = "Waiting for other player...";
-                Vector2 strSize = bigFont.MeasureString(str);
-                spriteBatch.DrawString(bigFont, str, new Vector2(uiViewport.Width / 2 - strSize.X / 2, uiViewport.Height / 2 - strSize.Y / 2), Color.White);
-            }
-
-            string s = gameClock.ToString("0.00");
-            Vector2 sSize = bigFont.MeasureString(s);
-            spriteBatch.DrawString(bigFont, s, new Vector2(sSize.X - sSize.X / 2, uiViewport.Height / 2 - sSize.Y / 2), Color.White);
-
-            spriteBatch.End();
-
-            GraphicsDevice.Viewport = minimapViewport;
-            //Matrix transform = camera.get_transformation(minimapViewport);
-
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, camera.get_minimap_transformation(minimapViewport));
-
-            drawMinimap(spriteBatch);
-
-            spriteBatch.End();
-            GraphicsDevice.Viewport = uiViewport;
-        }
-
-        void drawWayPoints(SpriteBatch spriteBatch)
-        {
-            //foreach (RtsObject o in SelectedUnits)
-            foreach (Unit unit in Unit.Units)
-            {
-                //Unit unit = o as Unit;
-
-                //if (unit != null && unit.IsMoving && unit.Commands.Count > 1 && unit.Commands[1] is MoveCommand)
-                if (unit != null && unit.IsMoving)
-                {
-                    line.ClearVectors();
-                    //line.Alpha = .6f;
-                    line.AddVector(unit.CenterPoint);
-                    //foreach (Vector2 v in unit.WayPoints)
-                    //    line.AddVector(v);
-                    foreach (UnitCommand command in unit.Commands)
-                    {
-                        MoveCommand moveCommand = command as MoveCommand;
-
-                        if (moveCommand == null)
-                            continue;
-
-                        if (moveCommand is AttackCommand)
-                            line.Colour = Color.Red * .85f;
-                        else
-                            line.Colour = Color.Green * .85f;
-
-                        foreach (Vector2 v in moveCommand.WayPoints)
-                            line.AddVector(v);
-
-                        line.RenderWithZoom(spriteBatch, camera.Zoom);
-                        line.ClearVectors();
-                        line.AddVector(moveCommand.Destination);
-                    }
-
-                    line.Alpha = .75f;
-                }
-            }
-        }
-
-        void drawResources(SpriteBatch spriteBatch)
-        {
-            foreach (Resource resource in Resource.Resources)
-            {
-                //float alpha = 1f;
-                //if (resource.Depleted)
-                //    alpha = .5f;
-
-                //spriteBatch.Draw(resource.Texture, resource.Rectangle, Color.White);
-                spriteBatch.Draw(resource.Texture, new Rectangle((int)resource.CenterPoint.X, (int)resource.CenterPoint.Y, resource.Width, resource.Height), null, Color.White, -camera.Rotation, resource.TextureCenterOrigin, SpriteEffects.None, 0f);
-
-                string s = resource.Amount.ToString();
-                Vector2 stringSize = unitInfoUnitNameFont.MeasureString(s);
-                //spriteBatch.DrawString(unitInfoUnitNameFont, s, new Vector2(resource.Rectangle.X + resource.Rectangle.Width / 2 - stringSize.X / 2, resource.Rectangle.Y + resource.Rectangle.Height / 2 - stringSize.Y / 2), Color.Black, -camera.Rotation, new Vector2(stringSize.X / 4, stringSize.Y / 4), 1f, SpriteEffects.None, 0f);
-
-                spriteBatch.DrawString(unitInfoUnitNameFont, s, resource.CenterPoint, Color.Black, -camera.Rotation, new Vector2(stringSize.X / 2, stringSize.Y / 2), 1f, SpriteEffects.None, 0f);
-
-                /*Roks roks = resource as Roks;
-                if (roks != null)
-                {
-                    foreach (PathNode pathNode in roks.exitPathNodes)
-                    {
-                        line.ClearVectors();
-                        line.AddVector(new Vector2(pathNode.Tile.Rectangle.X, pathNode.Tile.Rectangle.Y));
-                        line.AddVector(new Vector2(pathNode.Tile.Rectangle.X + pathNode.Tile.Width, pathNode.Tile.Rectangle.Y));
-                        line.AddVector(new Vector2(pathNode.Tile.Rectangle.X + pathNode.Tile.Width, pathNode.Tile.Rectangle.Y + pathNode.Tile.Rectangle.Height));
-                        line.AddVector(new Vector2(pathNode.Tile.Rectangle.X, pathNode.Tile.Rectangle.Y + pathNode.Tile.Rectangle.Height));
-                        line.AddVector(new Vector2(pathNode.Tile.Rectangle.X, pathNode.Tile.Rectangle.Y));
-                        line.Render(spriteBatch);
-                    }
-                }*/
-            }
         }
 
         void drawResourceCounts(SpriteBatch spriteBatch)
@@ -540,46 +665,6 @@ namespace rts
             spriteBatch.DrawString(resourceCountFont, roksPerSecondString, new Vector2((int)(roksStringX + roksStringSize.X / 2 - roksPerSecondStringSize.Y / 2), (int)(spacingY + roksPerSecondStringSize.Y)), Color.White);
         }
 
-        void drawStructures(SpriteBatch spriteBatch)
-        {
-            foreach (Structure structure in Structure.Structures)
-            {
-                if (structure.Visible || !structure.Visible)
-                {
-                    // draw team color indicator
-                    Rectangle teamIndicator = new Rectangle();
-                    teamIndicator.Width = (int)(structure.Rectangle.Width * .4f);
-                    teamIndicator.Height = (int)(structure.Rectangle.Height * .4f);
-                    teamIndicator.Location = new Point((int)(structure.CenterPointX - teamIndicator.Width / 2), (int)(structure.CenterPointY - teamIndicator.Height / 2));
-                    if (structure.Team == Player.Me.Team)
-                        spriteBatch.Draw(ColorTexture.Green, teamIndicator, Color.White);
-                    else
-                        spriteBatch.Draw(ColorTexture.Red, teamIndicator, Color.White);
-
-                    // draw structure
-                    //spriteBatch.Draw(structure.Texture, structure.Rectangle, Color.White);
-                    spriteBatch.Draw(structure.Texture, new Rectangle((int)structure.CenterPoint.X, (int)structure.CenterPoint.Y, structure.Width, structure.Height), null, Color.White, -camera.Rotation, structure.TextureCenterOrigin, SpriteEffects.None, 0f);
-                }
-                else if (structure.Revealed)
-                {
-                    //spriteBatch.Draw(ColorTexture.Red, new Rectangle((int)(structure.CenterPoint.X - 1), (int)(structure.CenterPoint.Y - 1), 2, 2), Color.White);
-
-                    Rectangle teamIndicator = new Rectangle();
-                    teamIndicator.Width = (int)(structure.Rectangle.Width * .4f);
-                    teamIndicator.Height = (int)(structure.Rectangle.Height * .4f);
-                    teamIndicator.Location = new Point((int)(structure.CenterPointX - teamIndicator.Width / 2), (int)(structure.CenterPointY - teamIndicator.Height / 2));
-                    //if (structure.Team == myTeam)
-                    //spriteBatch.Draw(ColorTexture.Green, teamIndicator, Color.White * .5f);
-                    // else
-                    //    spriteBatch.Draw(ColorTexture.Red, teamIndicator, Color.White * .5f);
-
-                    // draw structure
-                    //spriteBatch.Draw(structure.Texture, structure.Rectangle, Color.White * .9f);
-                    spriteBatch.Draw(structure.Texture, new Rectangle((int)structure.CenterPoint.X, (int)structure.CenterPoint.Y, structure.Width, structure.Height), null, Color.White * .9f, -camera.Rotation, structure.TextureCenterOrigin, SpriteEffects.None, 0f);
-                }
-            }
-        }
-
         void drawRallyPoints(SpriteBatch spriteBatch)
         {
             line.Colour = Color.Green;
@@ -611,63 +696,6 @@ namespace rts
             }
 
             line.Size = 1;
-        }
-
-        void drawUnits(SpriteBatch spriteBatch)
-        {
-            foreach (Unit unit in Unit.Units)
-            {
-                //if (unit.CurrentPathNode.Tile.Visible)
-                //if (unit.Visible)
-                {
-                    //if (!SelectingUnits.Contains(unit) && !SelectedUnits.Contains(unit))
-                    {
-                        spriteBatch.Draw(unit.Texture, new Rectangle((int)unit.CenterPoint.X, (int)unit.CenterPoint.Y, unit.Width, unit.Height), null, Color.White, unit.Rotation, unit.TextureCenterOrigin, SpriteEffects.None, 0f);
-                    }
-
-                    /*int teamIndicatorSize = (int)(unit.Diameter / 4);
-                    // Rectangle teamIndicator = new Rectangle((int)(unit.CenterPoint.X - teamIndicatorSize / 2), (int)(unit.CenterPoint.Y - teamIndicatorSize / 2), teamIndicatorSize, teamIndicatorSize);
-                    Rectangle teamIndicator = new Rectangle((int)unit.CenterPoint.X, (int)unit.CenterPoint.Y, teamIndicatorSize, teamIndicatorSize);
-
-                    if (unit.Team == myTeam)
-                        spriteBatch.Draw(ColorTexture.Green, teamIndicator, null, Color.White, unit.Rotation, ColorTexture.CenterVector, SpriteEffects.None, 0f);
-                    else
-                        spriteBatch.Draw(ColorTexture.Red, teamIndicator, null, Color.White, unit.Rotation, ColorTexture.CenterVector, SpriteEffects.None, 0f);*/
-
-                    if (unit.Team == Player.Me.Team)
-                        spriteBatch.Draw(greenTeamIndicatorTexture, new Rectangle((int)unit.CenterPoint.X, (int)unit.CenterPoint.Y, unit.Width, unit.Height), null, Color.White, unit.Rotation, new Vector2(greenTeamIndicatorTexture.Width / 2, greenTeamIndicatorTexture.Height / 2), SpriteEffects.None, 0f);
-                    else
-                        spriteBatch.Draw(redTeamIndicatorTexture, new Rectangle((int)unit.CenterPoint.X, (int)unit.CenterPoint.Y, unit.Width, unit.Height), null, Color.White, unit.Rotation, new Vector2(redTeamIndicatorTexture.Width / 2, redTeamIndicatorTexture.Height / 2), SpriteEffects.None, 0f);
-
-                    /*line.Colour = Color.Yellow;
-                    line.ClearVectors();
-                    float incrementRadians = MathHelper.TwoPi / 32f;
-                    for (float r = 0f; r <= MathHelper.TwoPi; r += incrementRadians)
-                    {
-                        line.AddVector(new Vector2(unit.CenterPointX + (unit.AttackRange + unit.Radius) * (float)Math.Cos(r), unit.CenterPointY + (unit.AttackRange + unit.Radius) * (float)Math.Sin(r)));
-                    }
-                    line.AddVector(new Vector2(unit.CenterPointX + unit.AttackRange + unit.Radius, unit.CenterPointY));
-                    line.Render(spriteBatch);*/
-
-                    /*line.Colour = Color.Black;
-                    lock (unit.PotentialCollisions)
-                    {
-                        foreach (Unit u in unit.PotentialCollisions)
-                        {
-                            line.ClearVectors();
-                            line.AddVector(unit.CenterPoint);
-                            line.AddVector(u.CenterPoint);
-                            line.Render(spriteBatch);
-                        }
-                    }*/
-                }
-                //else
-                //{
-                    //spriteBatch.Draw(ColorTexture.Red, new Rectangle((int)(unit.CenterPoint.X - 1), (int)(unit.CenterPoint.Y - 1), 2, 2), Color.White);
-                //}
-                // red dot showing X and Y location of unit
-                //spriteBatch.Draw(ColorTexture.Red, new Rectangle((int)(unit.X - 1), (int)(unit.Y - 1), 2, 2), Color.White);
-            }
         }
 
         void drawCargoOnUnits(SpriteBatch spriteBatch)
@@ -1113,6 +1141,38 @@ namespace rts
 
             minimapPosX = oldPosX;
             minimapPosY = oldPosY;
+        }
+
+        void drawGameClock(SpriteBatch spriteBatch)
+        {
+            //string s = gameClock.ToString("0.00");
+            TimeSpan t = TimeSpan.FromSeconds(gameClock);
+            string s;
+
+            if (gameClock >= 3600f)
+                s = t.ToString(@"hh\:mm\:ss");
+            else
+                s = t.ToString(@"mm\:ss");
+
+            Vector2 sSize = bigFont.MeasureString(s);
+            spriteBatch.DrawString(bigFont, s, new Vector2(minimapSize / 2 - sSize.X / 2, worldViewport.Height - sSize.Y), Color.White);
+        }
+
+        void drawSpecialMessages(SpriteBatch spriteBatch)
+        {
+            if (countingDown)
+            {
+                string str = countDownTime.ToString("0") + "...";
+                Vector2 strSize = bigFont.MeasureString(str);
+                spriteBatch.DrawString(bigFont, str, new Vector2(uiViewport.Width / 2 - strSize.X / 2, uiViewport.Height / 2 - strSize.Y / 2), Color.White);
+            }
+
+            if (waitingForMessage)
+            {
+                string str = "Waiting for other player...";
+                Vector2 strSize = bigFont.MeasureString(str);
+                spriteBatch.DrawString(bigFont, str, new Vector2(uiViewport.Width / 2 - strSize.X / 2, uiViewport.Height / 2 - strSize.Y / 2), Color.White);
+            }
         }
 
         // draw selection info area

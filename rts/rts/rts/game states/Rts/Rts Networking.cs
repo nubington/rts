@@ -40,7 +40,7 @@ namespace rts
 
         float gameClock = 0;
         float currentScheduleTime;
-        float countDownTime = 4f;
+        float countDownTime = COUNTDOWN_TIME;
         bool countingDown = true;
 
 
@@ -74,6 +74,21 @@ namespace rts
                     msg.Write(gameClock);
                     netPeer.SendMessage(msg, connection, NetDeliveryMethod.ReliableSequenced, 0);
                 }
+            }
+        }
+
+        float countDownSyncDelay = .05f;
+        void countDownSync(GameTime gameTime)
+        {
+            timeSinceLastSync += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (timeSinceLastSync >= countDownSyncDelay)
+            {
+                timeSinceLastSync = 0f;
+                NetOutgoingMessage msg = netPeer.CreateMessage();
+                msg.Write(MessageID.SYNC);
+                msg.Write(gameClock);
+                netPeer.SendMessage(msg, connection, NetDeliveryMethod.ReliableSequenced, 0);
             }
         }
 

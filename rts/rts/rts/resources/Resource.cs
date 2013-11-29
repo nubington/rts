@@ -39,6 +39,7 @@ namespace rts
         public ResourceType Type { get; private set; }
         public short ID { get; private set; }
         public bool AmountChanged;
+        public bool Visible;
 
         public List<PathNode> OccupiedPathNodes = new List<PathNode>();
 
