@@ -264,7 +264,7 @@ namespace rts
             {
                 TownHall townHall = findNearestTownHall(worker);
                 if (townHall != null)
-                    worker.InsertCommand(new ReturnCargoCommand(worker, townHall, this, 1));
+                    worker.InsertCommand(new ReturnCargoCommand(worker, townHall, this));
                 else
                     worker.NextCommand();
                 return false;

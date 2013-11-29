@@ -338,7 +338,7 @@ namespace rts
 
                     RtsObject target = FindNearestTarget();
                     if (target != null)
-                        GiveCommand(new AttackMoveCommand(this, centerPoint, int.MaxValue));
+                        GiveCommand(new AttackMoveCommand(this, centerPoint));
                 }
                 return;
             }
@@ -470,6 +470,12 @@ namespace rts
                     msg.Write(centerPoint.Y);
                     msg.Write(Rotation);
                     msg.Write(IsIdle);
+                    
+                    // send current command ID, -1 if none
+                    if (Commands.Count > 0)
+                        msg.Write(Commands[0].ID);
+                    else
+                        msg.Write((short)-1);
 
                     // send cargoAmount, 0 if not worker
                     WorkerNublet worker = this as WorkerNublet;
@@ -647,9 +653,9 @@ namespace rts
                 GiveCommand(command);
             else
             {
-                MoveCommand previousMoveCommand = Commands[Commands.Count - 1] as MoveCommand;
-                if (previousMoveCommand != null)
-                    command.WayPoints.Insert(0, previousMoveCommand.Destination);
+                //MoveCommand previousMoveCommand = Commands[Commands.Count - 1] as MoveCommand;
+                //if (previousMoveCommand != null)
+                //    command.WayPoints.Insert(0, previousMoveCommand.Destination);
                 Commands.Add(command);
             }
         }
@@ -856,7 +862,7 @@ namespace rts
             if (timeSinceLastSmoothPath >= smoothPathDelay)
             {
                 timeSinceLastSmoothPath = 0;
-                Rts.pathFinder.Tools.SmoothImmediatePath(command.WayPoints, this, centerPoint);
+                Rts.pathFinder.Tools.SmoothImmediatePath(command.WayPoints, this, centerPoint, false);
             }
         }
 

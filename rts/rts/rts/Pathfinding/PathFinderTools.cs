@@ -76,10 +76,15 @@ namespace rts
                 }
             }*/
         }
-        public void SmoothImmediatePath(List<Vector2> path, Unit unit, Vector2 beginLocation)
+        public void SmoothImmediatePath(List<Vector2> path, Unit unit, Vector2 beginLocation, bool queued)
         {
             if (path.Count < 2)
                 return;
+
+            // if path is for a queued command, insert beginLocation to beginning of path
+            // otherwise path will be smoothed out of existence. not sure why
+            if (queued)
+                path.Insert(0, beginLocation);
 
             /*for (int i = path.Count - 1; i >= 1; i--)
             {

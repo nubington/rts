@@ -112,7 +112,7 @@ namespace rts
                         scheduledUnitCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new MoveCommand(unit, destinationPoint, 1), true));
                     }*/
 
-                    scheduledUnitCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new MoveCommand(unit, destinationPoint, 1), usingShift));
+                    scheduledUnitCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new MoveCommand(unit, destinationPoint), usingShift));
                 }
             }
             // clicked outside magic box
@@ -154,7 +154,7 @@ namespace rts
                         scheduledUnitCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new MoveCommand(unit, destinationPoint, 1), true));
                     }*/
 
-                    scheduledUnitCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new MoveCommand(unit, destinationPoint, 1), usingShift));
+                    scheduledUnitCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new MoveCommand(unit, destinationPoint), usingShift));
                 }
             }
 
@@ -433,7 +433,7 @@ namespace rts
                         AttackMoveCommand command = new AttackMoveCommand(unit, destinationPoint, 1);
                         unit.QueueCommand(command);
                     }*/
-                    scheduledUnitCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new AttackMoveCommand(unit, destinationPoint, 1), usingShift));
+                    scheduledUnitCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new AttackMoveCommand(unit, destinationPoint), usingShift));
                 }
             }
             // clicked outside magic box
@@ -472,7 +472,7 @@ namespace rts
                     {
                         unit.QueueCommand(new AttackMoveCommand(unit, destinationPoint, 1));
                     }*/
-                    scheduledUnitCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new AttackMoveCommand(unit, destinationPoint, 1), usingShift));
+                    scheduledUnitCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new AttackMoveCommand(unit, destinationPoint), usingShift));
                 }
             }
 
@@ -590,7 +590,7 @@ namespace rts
                 workerWithSmallestQueue.QueueCommand(new BuildStructureCommand(workerWithSmallestQueue, placingStructureType, placingStructureLocation, placingStructureCenterPoint, 1));
                 Player.Me.Roks -= placingStructureType.RoksCost;
             }*/
-            BuildStructureCommand buildStructureCommand = new BuildStructureCommand(workerWithSmallestQueue, placingStructureType, placingStructureLocation, placingStructureCenterPoint, 1);
+            BuildStructureCommand buildStructureCommand = new BuildStructureCommand(workerWithSmallestQueue, placingStructureType, placingStructureLocation, placingStructureCenterPoint);
             ScheduledUnitBuildCommand scheduledUnitBuildCommand = new ScheduledUnitBuildCommand(currentScheduleTime, buildStructureCommand, usingShift);
             Player.Players[workerWithSmallestQueue.Team].ScheduledActions.Add(scheduledUnitBuildCommand);
             Player.Players[workerWithSmallestQueue.Team].Roks -= placingStructureType.RoksCost;
@@ -722,7 +722,7 @@ namespace rts
                                     worker.GiveCommand(new HarvestCommand(worker, resource, 1));
                                 else
                                     worker.QueueCommand(new HarvestCommand(worker, resource, 1));*/
-                                scheduledHarvestCommands.Add(new ScheduledUnitTargetedCommand(currentScheduleTime, new HarvestCommand(worker, resource, 1), resource, usingShift));
+                                scheduledHarvestCommands.Add(new ScheduledUnitTargetedCommand(currentScheduleTime, new HarvestCommand(worker, resource), resource, usingShift));
                             }
                             else
                             {
@@ -738,7 +738,7 @@ namespace rts
                                 else
                                     unit.QueueCommand(new MoveCommand(unit, destinationPoint, 1));*/
 
-                                scheduledMoveCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new MoveCommand(unit, destinationPoint, 1), usingShift));
+                                scheduledMoveCommands.Add(new ScheduledUnitCommand(currentScheduleTime, new MoveCommand(unit, destinationPoint), usingShift));
                             }
                         }
 
@@ -839,7 +839,7 @@ namespace rts
                     TownHall townHall = worker.FindNearestTownHall();
 
                     if (townHall != null)
-                        scheduledUnitCommands.Add(new ScheduledReturnCargoCommand(currentScheduleTime, new ReturnCargoCommand(worker, townHall, source, 1)));
+                        scheduledUnitCommands.Add(new ScheduledReturnCargoCommand(currentScheduleTime, new ReturnCargoCommand(worker, townHall, source)));
                 }
             }
 

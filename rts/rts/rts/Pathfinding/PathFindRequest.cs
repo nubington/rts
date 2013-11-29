@@ -21,16 +21,18 @@ namespace rts
         public PathNode StartNode;
         public bool AvoidUnits;
         public int Priority;
+        public bool Queued;
 
         public List<Vector2> WayPoints;
         //public Object WayPointsLock = new Object();
 
-        public PathFindRequest(MoveCommand command, PathNode startNode, int priority, bool avoidUnits)
+        public PathFindRequest(MoveCommand command, PathNode startNode, int priority, bool queued, bool avoidUnits)
         {
             Command = command;
             StartNode = startNode;
             AvoidUnits = avoidUnits;
             Priority = priority;
+            Queued = queued;
             AttackCommand attackCommand = command as AttackCommand;
             if (attackCommand != null)
                 Target = attackCommand.Target;

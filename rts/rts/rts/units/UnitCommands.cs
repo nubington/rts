@@ -38,7 +38,6 @@ namespace rts
     {
         private Vector2 destination;
         public List<Vector2> WayPoints;
-        public int Priority { get; private set; }
         public bool Calculated;
 
         /*public MoveCommand(List<Vector2> wayPoints, int priority)
@@ -52,13 +51,12 @@ namespace rts
             WayPoints.Add(wayPoint);
             Priority = priority;
         }*/
-        public MoveCommand(Unit unit, Vector2 destination, int priority) 
+        public MoveCommand(Unit unit, Vector2 destination) 
             : base(unit)
         {
             this.destination = destination;
             WayPoints = new List<Vector2>();
             WayPoints.Add(destination);
-            Priority = priority;
         }
 
         public void NextWayPoint(Unit unit, PathFinder pathFinder)
@@ -93,7 +91,7 @@ namespace rts
             this.target = target;
         }*/
         public AttackCommand(Unit unit, RtsObject target, bool willingToChangeTarget, bool holdPosition)
-            : base(unit, target.CenterPoint, 1)
+            : base(unit, target.CenterPoint)
         {
             Target = target;
             this.willingToChangeTarget = willingToChangeTarget;
@@ -118,8 +116,8 @@ namespace rts
 
     public class AttackMoveCommand : MoveCommand
     {
-        public AttackMoveCommand(Unit unit, Vector2 destination, int priority)
-            : base(unit, destination, priority)
+        public AttackMoveCommand(Unit unit, Vector2 destination)
+            : base(unit, destination)
         { }
     }
 
@@ -128,8 +126,8 @@ namespace rts
         public StructureType StructureType { get; private set; }
         public Point StructureLocation { get; private set; }
 
-        public BuildStructureCommand(Unit unit, StructureType structureType, Point structureLocation, Vector2 moveDestination, int priority)
-            : base(unit, moveDestination, priority)
+        public BuildStructureCommand(Unit unit, StructureType structureType, Point structureLocation, Vector2 moveDestination)
+            : base(unit, moveDestination)
         {
             StructureType = structureType;
             StructureLocation = structureLocation;
@@ -140,8 +138,8 @@ namespace rts
     {
         public Resource TargetResource { get; private set; }
 
-        public HarvestCommand(Unit unit, Resource targetResource, int priority)
-            : base(unit, targetResource.CenterPoint, priority)
+        public HarvestCommand(Unit unit, Resource targetResource)
+            : base(unit, targetResource.CenterPoint)
         {
             TargetResource = targetResource;
         }
@@ -152,8 +150,8 @@ namespace rts
         public Structure TargetStructure;
         public Resource Source { get; private set; }
 
-        public ReturnCargoCommand(Unit unit, Structure targetStructure, Resource source, int priority)
-            : base(unit, targetStructure.CenterPoint, priority)
+        public ReturnCargoCommand(Unit unit, Structure targetStructure, Resource source)
+            : base(unit, targetStructure.CenterPoint)
         {
             TargetStructure = targetStructure;
             Source = source;

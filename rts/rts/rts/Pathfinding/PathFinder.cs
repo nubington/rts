@@ -13,7 +13,7 @@ namespace rts
         public PathNode[,] PathNodes;
         public PathFinderTools Tools;
 
-        Thread Thread;
+        Thread Thread1;
 
         Unit currentUnit;
 
@@ -29,9 +29,9 @@ namespace rts
             initializePathNodes();
             Tools = new PathFinderTools(this);
 
-            Thread = new Thread(new ThreadStart(DoPathFindRequests));
-            Thread.IsBackground = true;
-            Thread.Start();
+            Thread1 = new Thread(new ThreadStart(DoPathFindRequests));
+            Thread1.IsBackground = true;
+            Thread1.Start();
         }
 
         void initializePathNodes()
@@ -492,7 +492,7 @@ namespace rts
                         //if (!(request.Command is AttackCommand))
 
                         Tools.SmoothPath(request.WayPoints, request.Command.Unit);
-                        Tools.SmoothImmediatePath(request.WayPoints, request.Command.Unit, request.StartNode.Tile.CenterPoint);
+                        Tools.SmoothImmediatePath(request.WayPoints, request.Command.Unit, request.StartNode.Tile.CenterPoint, request.Queued);
                     }
                 }
 
@@ -529,7 +529,7 @@ namespace rts
                 if (!recalculatingCurrentPath)
                     addHighPriorityPathFindRequest(command, distancePriority, avoidUnits);
                 else
-                    addLowPriorityPathFindRequest(command, command.Unit.CurrentPathNode, distancePriority, avoidUnits);
+                    addLowPriorityPathFindRequest(command, command.Unit.CurrentPathNode, distancePriority, queued, avoidUnits);
             }
             else
             {
@@ -537,7 +537,7 @@ namespace rts
 
                 distancePriority = (int)Vector2.DistanceSquared(beginLocation, command.Destination);
 
-                addLowPriorityPathFindRequest(command, Tools.PathNodeAt(beginLocation), distancePriority, avoidUnits);
+                addLowPriorityPathFindRequest(command, Tools.PathNodeAt(beginLocation), distancePriority, queued, avoidUnits);
             }
         }
 
@@ -547,7 +547,7 @@ namespace rts
             command.Calculated = false;
             //highPriorityRequestsToAdd.Enqueue(new PathFindRequest(command, command.Unit.CurrentPathNode, priority, avoidUnits));
 
-            highPriorityRequestsToAdd.Enqueue(new PathFindRequest(command, command.Unit.CurrentPathNode, priority, avoidUnits));
+            highPriorityRequestsToAdd.Enqueue(new PathFindRequest(command, command.Unit.CurrentPathNode, priority, false, avoidUnits));
         }
         /*// with attack target
         public void AddHighPriorityPathFindRequest(Unit unit, RtsObject attackTarget, MoveCommand command, PathNode startNode, int priority, bool avoidUnits)
@@ -557,10 +557,10 @@ namespace rts
         }*/
 
         // without attack target
-        void addLowPriorityPathFindRequest(MoveCommand command, PathNode startNode, int priority, bool avoidUnits)
+        void addLowPriorityPathFindRequest(MoveCommand command, PathNode startNode, int priority, bool queued, bool avoidUnits)
         {
             command.Calculated = false;
-            lowPriorityRequestsToAdd.Enqueue(new PathFindRequest(command, startNode, priority, avoidUnits));
+            lowPriorityRequestsToAdd.Enqueue(new PathFindRequest(command, startNode, priority, queued, avoidUnits));
         }
         /*// with attack target
         public void AddLowPriorityPathFindRequest(Unit unit, RtsObject attackTarget, MoveCommand command, PathNode startNode, int priority, bool avoidUnits)
@@ -634,16 +634,16 @@ namespace rts
 
         public void SuspendThread()
         {
-            Thread.Suspend();
+            Thread1.Suspend();
         }
         public void ResumeThread()
         {
-            if (!Thread.IsAlive)
-                Thread.Resume();
+            if (!Thread1.IsAlive)
+                Thread1.Resume();
         }
         public void AbortThread()
         {
-            Thread.Abort();
+            Thread1.Abort();
         }
 
         //************************************************************************************

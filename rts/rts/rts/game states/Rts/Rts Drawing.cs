@@ -175,40 +175,7 @@ namespace rts
                     spriteBatch.Draw(a, new Rectangle(a.Rectangle.Center.X, a.Rectangle.Center.Y, a.Rectangle.Width, a.Rectangle.Height), null, Color.White, a.Rotation, new Vector2(((Texture2D)a).Width / 2, ((Texture2D)a).Height / 2), SpriteEffects.None, 0f);
             }
 
-            foreach (RtsObject o in SelectedUnits)
-            {
-                Unit unit = o as Unit;
-                //if (unit != null && unit.IsMoving && unit.Commands.Count > 1 && unit.Commands[1] is MoveCommand)
-                if (unit != null && unit.IsMoving)
-                {
-                    line.ClearVectors();
-                    //line.Alpha = .6f;
-                    line.AddVector(unit.CenterPoint);
-                    //foreach (Vector2 v in unit.WayPoints)
-                    //    line.AddVector(v);
-                    foreach (UnitCommand command in unit.Commands)
-                    {
-                        MoveCommand moveCommand = command as MoveCommand;
-
-                        if (moveCommand == null)
-                            continue;
-
-                        if (moveCommand is AttackCommand)
-                            line.Colour = Color.Red * .85f;
-                        else
-                            line.Colour = Color.Green * .85f;
-
-                        foreach (Vector2 v in moveCommand.WayPoints)
-                            line.AddVector(v);
-
-                        line.RenderWithZoom(spriteBatch, camera.Zoom);
-                        line.ClearVectors();
-                        line.AddVector(moveCommand.Destination);
-                    }
-
-                    line.Alpha = .75f;
-                }
-            }
+            drawWayPoints(spriteBatch);
 
             if (SelectedUnits.Count == 1)
             {
@@ -466,6 +433,46 @@ namespace rts
             GraphicsDevice.Viewport = uiViewport;
         }
 
+        void drawWayPoints(SpriteBatch spriteBatch)
+        {
+            //foreach (RtsObject o in SelectedUnits)
+            foreach (Unit unit in Unit.Units)
+            {
+                //Unit unit = o as Unit;
+
+                //if (unit != null && unit.IsMoving && unit.Commands.Count > 1 && unit.Commands[1] is MoveCommand)
+                if (unit != null && unit.IsMoving)
+                {
+                    line.ClearVectors();
+                    //line.Alpha = .6f;
+                    line.AddVector(unit.CenterPoint);
+                    //foreach (Vector2 v in unit.WayPoints)
+                    //    line.AddVector(v);
+                    foreach (UnitCommand command in unit.Commands)
+                    {
+                        MoveCommand moveCommand = command as MoveCommand;
+
+                        if (moveCommand == null)
+                            continue;
+
+                        if (moveCommand is AttackCommand)
+                            line.Colour = Color.Red * .85f;
+                        else
+                            line.Colour = Color.Green * .85f;
+
+                        foreach (Vector2 v in moveCommand.WayPoints)
+                            line.AddVector(v);
+
+                        line.RenderWithZoom(spriteBatch, camera.Zoom);
+                        line.ClearVectors();
+                        line.AddVector(moveCommand.Destination);
+                    }
+
+                    line.Alpha = .75f;
+                }
+            }
+        }
+
         void drawResources(SpriteBatch spriteBatch)
         {
             foreach (Resource resource in Resource.Resources)
@@ -673,7 +680,7 @@ namespace rts
                     WorkerNublet worker = unit as WorkerNublet;
                     if (worker != null)
                     {
-                        if (worker.CargoAmount > 0)
+                        if (worker.CargoAmount > 0 && worker.CargoType != null)
                         {
                             spriteBatch.Draw(worker.CargoType.CargoTexture, new Rectangle((int)unit.CenterPoint.X, (int)unit.CenterPoint.Y, (int)(unit.Width * .75f), (int)(unit.Height * .75f)), null, Color.White, unit.Rotation, unit.TextureCenterOrigin, SpriteEffects.None, 0f);
                         }

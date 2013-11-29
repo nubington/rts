@@ -196,7 +196,7 @@ namespace rts
                     {
                         Resource nearestResource = findNearestResource(targetResource.Type);
                         if (nearestResource != null)
-                            GiveCommand(new HarvestCommand(this, nearestResource, 1));
+                            GiveCommand(new HarvestCommand(this, nearestResource));
                         else
                             NextCommand();
                     }
@@ -243,7 +243,7 @@ namespace rts
                 {
                     Resource nearestResource = findNearestResource(targetResource.Type);
                     if (nearestResource != null)
-                        GiveCommand(new HarvestCommand(this, nearestResource, 1));
+                        GiveCommand(new HarvestCommand(this, nearestResource));
                     else
                         NextCommand();
                 }
@@ -390,12 +390,12 @@ namespace rts
                 HarvestCommand harvestCommand = null;
 
                 if (command.Source != null && !command.Source.Depleted)
-                    harvestCommand = new HarvestCommand(this, command.Source, 1);
+                    harvestCommand = new HarvestCommand(this, command.Source);
                 else
                 {
                     Resource nearestResource = findNearestResource(CargoType);
                     if (nearestResource != null && !nearestResource.Depleted)
-                        harvestCommand = new HarvestCommand(this, nearestResource, 1);
+                        harvestCommand = new HarvestCommand(this, nearestResource);
                 }
 
                 if (harvestCommand != null)
@@ -438,7 +438,7 @@ namespace rts
 
                 stop();
 
-                InsertCommand(new ReturnCargoCommand(this, nearestTownHall, source, 1));
+                InsertCommand(new ReturnCargoCommand(this, nearestTownHall, source));
             }
         }
 
@@ -463,7 +463,7 @@ namespace rts
                     //command.TargetStructure = townHall;
                     //PathFinder.AddHighPriorityPathFindRequest(this, command, CurrentPathNode, 1, false);
 
-                    Commands.Insert(1, new ReturnCargoCommand(this, townHall, command.Source, 1));
+                    Commands.Insert(1, new ReturnCargoCommand(this, townHall, command.Source));
                     NextCommand();
                     //InsertCommand(new ReturnCargoCommand(townHall, command.Source, 1));
                 }

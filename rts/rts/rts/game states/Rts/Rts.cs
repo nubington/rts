@@ -195,7 +195,13 @@ namespace rts
                     {
                         if (msg.MessageType == NetIncomingMessageType.Data)
                         {
-                            int id = msg.ReadInt32();
+                            int id = -1;
+                            try
+                            {
+                                id = msg.ReadInt32();
+                            }
+                            catch (Exception e)
+                            { }
 
                             if (id == 0)
                             {
@@ -228,11 +234,11 @@ namespace rts
             connection = netPeer.Connections[0];
 
             // clear incoming messages
-            /*NetIncomingMessage muh;
+            NetIncomingMessage muh;
             while ((muh = netPeer.ReadMessage()) != null)
             {
                 netPeer.Recycle(muh);
-            }*/
+            }
         }
 
         void initializeStartingPoints()

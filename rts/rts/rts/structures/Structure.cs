@@ -531,9 +531,9 @@ namespace rts
                     MoveCommand command = null;
 
                     if (rallyPoints[0].Resource != null && unit is WorkerNublet)
-                        command = new HarvestCommand(unit, rallyPoints[0].Resource, 1);
+                        command = new HarvestCommand(unit, rallyPoints[0].Resource);
                     else
-                        command = new MoveCommand(unit, RallyPoints[0].Point, 1);
+                        command = new MoveCommand(unit, RallyPoints[0].Point);
 
                     if (command != null)
                     {
@@ -544,9 +544,9 @@ namespace rts
                     for (int i = 1; i < RallyPoints.Count; i++)
                     {
                         if (rallyPoints[i].Resource != null && unit is WorkerNublet)
-                            unit.QueueCommand(new HarvestCommand(unit, rallyPoints[i].Resource, 1));
+                            unit.QueueCommand(new HarvestCommand(unit, rallyPoints[i].Resource));
                         else
-                            unit.QueueCommand(new MoveCommand(unit, RallyPoints[i].Point, 1));
+                            unit.QueueCommand(new MoveCommand(unit, RallyPoints[i].Point));
                     }
 
                     unit.CheckForWallHit();
