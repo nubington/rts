@@ -279,19 +279,12 @@ namespace rts
             //Cursor.Clip = new System.Drawing.Rectangle(winForm.Location, winForm.Size);
             Rts.gameTime = gameTime;
 
-            GameClock += (float)gameTime.ElapsedGameTime.TotalSeconds * GameSpeed;
+            if (!waitingForMessage)
+                GameClock += (float)gameTime.ElapsedGameTime.TotalSeconds * GameSpeed;
 
             // count down
             if (doCountDown())
                 return;
-
-            if (waitingForMessage)
-            {
-                checkToCheckup(gameTime);
-                receiveData(gameTime);
-                GameClock -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-                return;
-            }
 
             // send time sync message if server
             checkToSync(gameTime);
@@ -301,11 +294,12 @@ namespace rts
             // receive and process network messages
             receiveData(gameTime);
 
-            // do cleanup of player unit/structure arrays
-            Player.SetNullIDS();
-
             // mute check
             checkForMute();
+
+            // update mouse and keyboard state
+            mouseState = Mouse.GetState();
+            keyboardState = Keyboard.GetState();
 
             // pause check
             /*if (Keyboard.GetState(PlayerIndex.One).IsKeyUp(Keys.P))
@@ -326,9 +320,8 @@ namespace rts
                 }
             }*/
 
-            // update mouse and keyboard state
-            mouseState = Mouse.GetState();
-            keyboardState = Keyboard.GetState();
+            // do cleanup of player unit/structure arrays
+            Player.SetNullIDS();
 
             // pathfinding performance info
             timeForPathFindingProfiling += gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -349,19 +342,6 @@ namespace rts
                 }
             }
 
-            // do nothing else if paused
-            if (paused)
-                return;
-
-            doScheduledActions();
-            doDelayedPathUpdates();
-
-            checkForUnitStatusUpdates(gameTime);
-            checkForStructureStatusUpdates(gameTime);
-
-            //update stats
-            updateStats(gameTime);
-
             //update fps
             fpsElapsedTime += gameTime.ElapsedGameTime;
             if (fpsElapsedTime > TimeSpan.FromSeconds(1))
@@ -373,87 +353,50 @@ namespace rts
                 frameCounter = 0;
             }
 
-            // update buttons
-            SimpleButton.UpdateAll(mouseState, keyboardState);
+            // do nothing else if paused
+            if (paused)
+                return;
 
-            /*if (button1.Rectangle.Contains(mouseState.X, mouseState.Y) && mouseState.LeftButton == ButtonState.Pressed)
-            {
-                Unit brownGuy;
-                brownGuy = new RangedNublet(new Vector2(worldViewport.Width * .25f, worldViewport.Height / 2), 1);
-                brownGuy.InitializeCurrentPathNode();
-                //brownGuy.Texture = brownGuyTexture;
-                //brownGuy.AddWayPoint(new Vector2(Graphics.GraphicsDevice.Viewport.Width * .75f, Graphics.GraphicsDevice.Viewport.Height / 2));
-                brownGuy.GiveCommand(new MoveCommand(new Vector2(worldViewport.Width * .75f, worldViewport.Height / 2), 1));
-            }*/
-            /*if (button2.Rectangle.Contains(mouseState.X, mouseState.Y) && mouseState.LeftButton == ButtonState.Pressed)
-            {
-                for (int i = 0; i < 10; i++)
-                {
-                    Unit brownGuy;
-                    brownGuy = new RangedNublet(new Vector2(worldViewport.Width * .25f, worldViewport.Height / 2), 0);
-                    brownGuy.InitializeCurrentPathNode();
-                    //brownGuy.Texture = brownGuyTexture;
-                    //brownGuy.AddWayPoint(new Vector2(Graphics.GraphicsDevice.Viewport.Width * .75f, Graphics.GraphicsDevice.Viewport.Height / 2));
-                    brownGuy.GiveCommand(new MoveCommand(brownGuy, new Vector2(worldViewport.Width * .75f, worldViewport.Height / 2), 1));
-                }
-            }/*
-            else if (button3.Rectangle.Contains(mouseState.X, mouseState.Y) && mouseState.LeftButton == ButtonState.Pressed)
-            {
-                Graphics.ToggleFullScreen();
-                Graphics.ApplyChanges();
-                uiViewport = GraphicsDevice.Viewport;
-                worldViewport = GraphicsDevice.Viewport;
-                worldViewport.Height -= (minimapSize + minimapBorderSize * 2);
-                GraphicsDevice.Viewport = worldViewport;
-                initializeMapTexture();
-                initializeCommandCardArea();
-                initializeSelectionInfoArea();
-            }
-            else if (button4.Rectangle.Contains(mouseState.X, mouseState.Y) && mouseState.LeftButton == ButtonState.Pressed)
-            {
-                Unit meleeNublet;
-                meleeNublet = new MeleeNublet(new Vector2(worldViewport.Width * .25f, worldViewport.Height / 2), 0);
-                meleeNublet.InitializeCurrentPathNode();
-                //brownGuy.Texture = brownGuyTexture;
-                //brownGuy.AddWayPoint(new Vector2(Graphics.GraphicsDevice.Viewport.Width * .75f, Graphics.GraphicsDevice.Viewport.Height / 2));
-                meleeNublet.GiveCommand(new MoveCommand(new Vector2(worldViewport.Width * .75f, worldViewport.Height / 2), 1));
-            }
-            else if (button5.Rectangle.Contains(mouseState.X, mouseState.Y) && mouseState.LeftButton == ButtonState.Pressed)
-            {
-                foreach (Unit unit in Unit.Units)
-                {
-                    unit.Die();
-                }
-            }*/
-
-            /*if (SelectedUnits.Count == 1)
-            {
-                Game1.Game.Window.Title = "idle: " + SelectedUnits[0].IsIdle + " hp: " + SelectedUnits[0].Hp + "/" + SelectedUnits[0].MaxHp + ". position " + SelectedUnits[0].CenterPoint;
-            }*/
-
+            // input processing
             checkForShift(gameTime);
-
             checkForCommands();
+            SimpleButton.UpdateAll(mouseState, keyboardState);
+            checkHotKeyGroups(gameTime);
+            
+            checkForLeftClick(gameTime);
+            checkForRightClick();
+            checkForTab();
 
-            map.UpdateBoundingBoxes();
+            checkForMouseCameraScroll(gameTime);
+            checkForCameraZoom(gameTime);
+            checkForCameraRotate(gameTime);
+            if (keyboardState.IsKeyDown(Keys.Space))
+                centerCameraOnSelectedUnits();
+            clampCameraToMap();
 
             updatePlacingStructure();
             updatePlacedStructures();
 
-            updateCogWheels(gameTime);
-
-            Shrinker.UpdateShrinkers(gameTime);
-
-            checkHotKeyGroups(gameTime);
-
             if (!placingStructure)
                 SelectBox.Update(worldViewport, camera);
 
-            checkForLeftClick(gameTime);
+            Shrinker.UpdateShrinkers(gameTime);
 
-            checkForRightClick();
+            // do nothing else if waiting for message
+            if (waitingForMessage)
+                return;
 
-            checkForTab();
+            doScheduledActions();
+
+            checkForUnitStatusUpdates(gameTime);
+            checkForStructureStatusUpdates(gameTime);
+
+            //update stats
+            updateStats(gameTime);
+
+            map.UpdateBoundingBoxes();
+
+            updateCogWheels(gameTime);
 
             RtsBullet.UpdateAll(gameTime);
 
@@ -465,13 +408,6 @@ namespace rts
             removeDeadUnitsFromSelections();
 
             applyVisibilityToMap();
-
-            checkForMouseCameraScroll(gameTime);
-            checkForCameraZoom(gameTime);
-            checkForCameraRotate(gameTime);
-            if (keyboardState.IsKeyDown(Keys.Space))
-                centerCameraOnSelectedUnits();
-            clampCameraToMap();
         }
 
         // returns true if still counting down
@@ -800,7 +736,7 @@ namespace rts
             }
         }
 
-        void doDelayedPathUpdates()
+        /*void doDelayedPathUpdates()
         {
             for (int i = 0; i < DelayedPathUpdate.DelayedPathUpdates.Count; )
             {
@@ -818,6 +754,6 @@ namespace rts
 
                 DelayedPathUpdate.DelayedPathUpdates.Remove(update);
             }
-        }
+        }*/
     }
 }

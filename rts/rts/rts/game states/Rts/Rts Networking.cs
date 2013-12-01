@@ -118,7 +118,7 @@ namespace rts
         }
         // resource status updates are handled by the resources themselves
 
-        float timeSinceMessageReceived, timeOutDelay = .55f;
+        float timeSinceMessageReceived, timeOutDelay = .53f;
         float CurrentPing;
         bool waitingForMessage;
         void receiveData(GameTime gameTime)
