@@ -176,7 +176,7 @@ namespace rts
                         {
                             NetOutgoingMessage mm = netPeer.CreateMessage();
                             msg.Write(1);
-                            msg.Write(gameClock);
+                            msg.Write(GameClock);
                             netPeer.SendMessage(mm, netPeer.Connections[0], NetDeliveryMethod.ReliableUnordered);
 
                             break;
@@ -219,8 +219,9 @@ namespace rts
                                 //gameClock = netPeer.Connections[0].AverageRoundtripTime / 2f;
                                 //countDownTime -= netPeer.Connections[0].AverageRoundtripTime / 2f;
 
-                                gameClock = clock + netPeer.Connections[0].AverageRoundtripTime / 2f;
-                                countDownTime -= clock + netPeer.Connections[0].AverageRoundtripTime / 2f;
+                                GameClock = clock + netPeer.Connections[0].AverageRoundtripTime / 2f;
+                                //countDownTime -= clock + netPeer.Connections[0].AverageRoundtripTime / 2f;
+                                countDownTime = COUNTDOWN_TIME - GameClock;
 
                                 netPeer.Recycle(msg);
                                 break;
@@ -263,6 +264,7 @@ namespace rts
 
         public override void Update(GameTime gameTime)
         {
+            int i = Player.Me.UnitArray.Length;
             // check for exit
             /*if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 Game1.Game.Exit();
@@ -276,8 +278,8 @@ namespace rts
 
             //Cursor.Clip = new System.Drawing.Rectangle(winForm.Location, winForm.Size);
             Rts.gameTime = gameTime;
-            
-            gameClock += (float)gameTime.ElapsedGameTime.TotalSeconds * GameSpeed;
+
+            GameClock += (float)gameTime.ElapsedGameTime.TotalSeconds * GameSpeed;
 
             // count down
             if (doCountDown())
@@ -287,15 +289,20 @@ namespace rts
             {
                 checkToCheckup(gameTime);
                 receiveData(gameTime);
-                gameClock -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                GameClock -= (float)gameTime.ElapsedGameTime.TotalSeconds;
                 return;
             }
 
             // send time sync message if server
             checkToSync(gameTime);
+            // just checkup if not server
             checkToCheckup(gameTime);
 
+            // receive and process network messages
             receiveData(gameTime);
+
+            // do cleanup of player unit/structure arrays
+            Player.SetNullIDS();
 
             // mute check
             checkForMute();
@@ -478,7 +485,7 @@ namespace rts
             if (countDownTime <= 0f)
             {
                 countingDown = false;
-                gameClock = 0f;
+                GameClock = 0f;
                 //clearMessages();
                 return false;
             }
@@ -501,13 +508,13 @@ namespace rts
                         {
                             if (msg.ReadByte() == MessageID.SYNC && countingDown)
                             {
-                                gameClock = msg.ReadFloat() + connection.AverageRoundtripTime / 2f;
-                                countDownTime = COUNTDOWN_TIME - gameClock;
+                                GameClock = msg.ReadFloat() + connection.AverageRoundtripTime / 2f;
+                                countDownTime = COUNTDOWN_TIME - GameClock;
 
                                 if (countDownTime <= 0f)
                                 {
                                     countingDown = false;
-                                    gameClock = 0f;
+                                    GameClock = 0f;
                                     //clearMessages();
                                     return false;
                                 }
@@ -729,7 +736,7 @@ namespace rts
                 {
                     ScheduledAction action = player.ScheduledActions[i];
 
-                    if (action.ScheduledTime <= gameClock)
+                    if (action.ScheduledTime <= GameClock)
                     {
                         ScheduledReturnCargoCommand scheduledReturnCargoCommand = action as ScheduledReturnCargoCommand;
                         if (scheduledReturnCargoCommand != null)

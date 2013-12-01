@@ -1672,7 +1672,8 @@ namespace rts
 
             clearCommands();
 
-            Player.Players[Team].UnitArray[ID] = null;
+            //Player.Players[Team].UnitArray[ID] = null;
+            Player.Players[Team].UnitIDsToSetNull.Add(new KeyValuePair<short, float>(ID, Rts.GameClock));
 
             NetOutgoingMessage msg = Rts.netPeer.CreateMessage();
             msg.Write(MessageID.UNIT_DEATH);

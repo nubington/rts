@@ -141,6 +141,9 @@
     <Compile Include="Pathfinding\PathFindRequest.cs" />
     <Compile Include="Pathfinding\PathNode.cs" />
     <Compile Include="Player\PlayerStats.cs" />
+    <Compile Include="Structure\BuildQueueItem.cs" />
+    <Compile Include="Structure\RallyPoint.cs" />
+    <Compile Include="Structure\StructureCogWheel.cs" />
     <Compile Include="UI\CommandCard.cs" />
     <Compile Include="game states\HostLobby.cs" />
     <Compile Include="game states\Rts\Rts Drawing.cs" />
@@ -175,11 +178,11 @@
     <Compile Include="UI\SelectBox.cs" />
     <Compile Include="Selection.cs" />
     <Compile Include="Shrinker.cs" />
-    <Compile Include="structures\Barracks.cs" />
-    <Compile Include="structures\Farm.cs" />
-    <Compile Include="structures\Structure.cs" />
-    <Compile Include="structures\StructureType.cs" />
-    <Compile Include="structures\TownHall.cs" />
+    <Compile Include="Structure\structures\Barracks.cs" />
+    <Compile Include="Structure\structures\Farm.cs" />
+    <Compile Include="Structure\Structure.cs" />
+    <Compile Include="Structure\StructureType.cs" />
+    <Compile Include="Structure\structures\TownHall.cs" />
     <Compile Include="units\MeleeNublet.cs" />
     <Compile Include="units\RangedNublet.cs" />
     <Compile Include="units\Unit.cs" />

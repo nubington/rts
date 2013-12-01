@@ -580,6 +580,8 @@ namespace rts
                 CogWheel = null;
             }
 
+            Player.Players[Team].StructureIDsToSetNull.Add(new KeyValuePair<short, float>(ID, Rts.GameClock));
+
             NetOutgoingMessage msg = Rts.netPeer.CreateMessage();
             msg.Write(MessageID.STRUCTURE_DEATH);
             msg.Write(ID);
@@ -658,84 +660,6 @@ namespace rts
             {
                 return type.Name;
             }
-        }
-    }
-
-    public class BuildQueueItem
-    {
-        public readonly ProductionButtonType Type;
-        public readonly short ID;
-
-        public readonly int BuildTime;
-        public bool Started;
-
-        int timeElapsed, percentDone;
-        bool done;
-
-        public BuildQueueItem(ProductionButtonType commandType, short id, int buildTime)
-        {
-            Type = commandType;
-            ID = id;
-            BuildTime = buildTime;
-        }
-
-        public void UpdateTime(GameTime gameTime)
-        {
-            if (!Started)
-                return;
-
-            timeElapsed += (int)(gameTime.ElapsedGameTime.TotalMilliseconds * Rts.GameSpeed);
-
-            if (timeElapsed >= BuildTime)
-            {
-                done = true;
-                percentDone = 100;
-            }
-            else
-            {
-                percentDone = (int)(timeElapsed / (float)BuildTime * 100);
-            }
-        }
-
-        public bool Done
-        {
-            get
-            {
-                return done;
-            }
-        }
-        public int PercentDone
-        {
-            get
-            {
-                return percentDone;
-            }
-        }
-    }
-
-    public class StructureCogWheel
-    {
-        public Structure Structure { get; private set; }
-        public float Rotation = 0;
-        public Rectangle Rectangle { get; private set; }
-
-        public StructureCogWheel(Structure structure, int size)
-        {
-            Structure = structure;
-            //Rectangle = new Rectangle((int)(structure.CenterPointX - size / 2), (int)(structure.CenterPointY - size / 2), size, size);
-            Rectangle = new Rectangle((int)(structure.CenterPointX), (int)(structure.CenterPointY), size, size);
-        }
-    }
-
-    public class RallyPoint
-    {
-        public Resource Resource { get; private set; }
-        public Vector2 Point { get; private set; }
-
-        public RallyPoint(Vector2 point, Resource resource)
-        {
-            Point = point;
-            Resource = resource;
         }
     }
 }

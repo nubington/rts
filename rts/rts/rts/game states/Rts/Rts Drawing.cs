@@ -1146,10 +1146,10 @@ namespace rts
         void drawGameClock(SpriteBatch spriteBatch)
         {
             //string s = gameClock.ToString("0.00");
-            TimeSpan t = TimeSpan.FromSeconds(gameClock);
+            TimeSpan t = TimeSpan.FromSeconds(GameClock);
             string s;
 
-            if (gameClock >= 3600f)
+            if (GameClock >= 3600f)
                 s = t.ToString(@"hh\:mm\:ss");
             else
                 s = t.ToString(@"mm\:ss");
