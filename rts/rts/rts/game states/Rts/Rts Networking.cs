@@ -216,8 +216,8 @@ namespace rts
             }
 
             CurrentPing = connection.AverageRoundtripTime;
-            //currentScheduleTime = gameClock + currentPing * .6f;
-            currentScheduleTime = GameClock + .1f;
+            //currentScheduleTime = GameClock + CurrentPing * 2;
+            currentScheduleTime = GameClock + .2f;
         }
 
         void processUnitMoveCommandBatch(NetIncomingMessage msg)
@@ -232,11 +232,15 @@ namespace rts
                 short unitID = msg.ReadInt16();
                 Unit unit = Player.Players[team].UnitArray[unitID];
                 Vector2 destination = new Vector2(msg.ReadFloat(), msg.ReadFloat());
-                //if (unit != null)
+                if (unit != null)
                 {
                     MoveCommand moveCommand = new MoveCommand(unit, destination);
                     Player.Players[team].ScheduledActions.Add(new ScheduledUnitCommand(scheduledTime, moveCommand, queued));
                     //Rts.pathFinder.AddHighPriorityPathFindRequest(moveCommand, (int)Vector2.DistanceSquared(moveCommand.Unit.CenterPoint, moveCommand.Destination), false);
+                }
+                else
+                {
+                    int wut = 0;
                 }
             }
         }
@@ -245,11 +249,17 @@ namespace rts
         {
             float scheduledTime = msg.ReadFloat();
             short team = msg.ReadInt16();
-
-            Structure structure = Player.Players[team].StructureArray[msg.ReadInt16()];
-            CommandButtonType commandType = CommandButtonType.CommandButtonTypes[msg.ReadInt16()];
-
+            short structureID = msg.ReadInt16();
+            short commandTypeID = msg.ReadInt16();
             short unitID = msg.ReadInt16();
+
+            Structure structure = Player.Players[team].StructureArray[structureID];
+            CommandButtonType commandType = CommandButtonType.CommandButtonTypes[commandTypeID];
+
+            if (structure == null)
+            {
+                int wut = 0;
+            }
 
             Player.Players[team].ScheduledActions.Add(new ScheduledStructureCommand(scheduledTime, structure, commandType, unitID)); 
         }
@@ -299,7 +309,8 @@ namespace rts
                 //if (unit.IsIdle)
                 if (idle)
                 {
-                    unit.CenterPoint = position;
+                    //if (unit.IsIdle)
+                    //    unit.CenterPoint = position;
 
                     if (!unit.IsIdle)
                         unit.NextCommand();
@@ -430,11 +441,16 @@ namespace rts
             {
                 int unitID = msg.ReadInt16();
                 Unit unit = Player.Players[team].UnitArray[unitID];
+                Vector2 destination = new Vector2(msg.ReadFloat(), msg.ReadFloat());
                 if (unit != null)
                 {
-                    AttackMoveCommand attackMoveCommand = new AttackMoveCommand(unit, new Vector2(msg.ReadFloat(), msg.ReadFloat()));
+                    AttackMoveCommand attackMoveCommand = new AttackMoveCommand(unit, destination);
                     Player.Players[team].ScheduledActions.Add(new ScheduledUnitCommand(scheduledTime, attackMoveCommand, queued));
                     //Rts.pathFinder.AddHighPriorityPathFindRequest(attackMoveCommand, (int)Vector2.DistanceSquared(attackMoveCommand.Unit.CenterPoint, attackMoveCommand.Destination), false);
+                }
+                else
+                {
+                    int wut = 0;
                 }
             }
         }
@@ -544,7 +560,7 @@ namespace rts
 
             Structure structure = Player.Players[team].StructureArray[structureID];
 
-            if (!structure.IsDead)
+            if (structure != null && !structure.IsDead)
                 structure.Die();
         }
 

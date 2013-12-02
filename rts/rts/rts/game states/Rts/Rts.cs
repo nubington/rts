@@ -164,7 +164,12 @@ namespace rts
             {
                 NetOutgoingMessage msg = netPeer.CreateMessage();
                 msg.Write(0);
-                netPeer.SendMessage(msg, netPeer.Connections[0], NetDeliveryMethod.ReliableUnordered);
+                try
+                {
+                    netPeer.SendMessage(msg, netPeer.Connections[0], NetDeliveryMethod.ReliableUnordered);
+                }
+                catch (Exception e)
+                { }
 
                 while (true)
                 {
@@ -172,7 +177,7 @@ namespace rts
 
                     if ((m = netPeer.ReadMessage()) != null)
                     {
-                        if (m.ReadInt32() == 0)
+                        if (m.ReadInt32() == 113)
                         {
                             NetOutgoingMessage mm = netPeer.CreateMessage();
                             msg.Write(1);
@@ -204,12 +209,16 @@ namespace rts
                                 id = msg.ReadInt32();
                             }
                             catch (Exception e)
-                            { }
+                            {
+                                countDownTime = COUNTDOWN_TIME;
+                                netPeer.Recycle(msg);
+                                break;
+                            }
 
                             if (id == 0)
                             {
                                 NetOutgoingMessage m = netPeer.CreateMessage();
-                                m.Write(0);
+                                m.Write(113);
                                 netPeer.SendMessage(m, netPeer.Connections[0], NetDeliveryMethod.ReliableUnordered);
                             }
                             else if (id == 1)
@@ -712,8 +721,8 @@ namespace rts
                         if (scheduledStructureCommand != null)
                         {
                             // shouldnt happen but wtf
-                            if (scheduledStructureCommand.Structure == null)
-                                continue;
+                            //if (scheduledStructureCommand.Structure == null)
+                            //    continue;
 
                             if (scheduledStructureCommand.CommandType == CommandButtonType.RallyPoint)
                             {

@@ -128,6 +128,9 @@ namespace rts
                 client = new NetClient(config);
                 client.Start();
 
+                //client.Configuration.SimulatedMinimumLatency = .5f;
+                //client.Configuration.SimulatedRandomLatency = .01f;
+
                 client.DiscoverLocalPeers(14242);
 
                 state = StartMenuState.Joining;
@@ -144,6 +147,9 @@ namespace rts
 
                 client = new NetClient(config);
                 client.Start();
+
+                //client.Configuration.SimulatedMinimumLatency = .5f;
+                //client.Configuration.SimulatedRandomLatency = .01f;
 
                 foreach (string host in hosts)
                     client.DiscoverKnownPeer(host, 14242);

@@ -128,15 +128,12 @@ namespace rts
 
             drawResourceCounts(spriteBatch);
 
-            //pause and fps count
+            //pause message and count fps
             Vector2 pauseStringSize = pauseFont.MeasureString("PAUSED");
             if (paused)
                 spriteBatch.DrawString(pauseFont, "PAUSED", new Vector2(uiViewport.Width / 2 - pauseStringSize.X / 2, uiViewport.Height / 2 - pauseStringSize.Y / 2), Color.White);
             else
                 frameCounter++;
-
-            // fps message
-            spriteBatch.DrawString(fpsFont, fpsMessage, new Vector2(8, 5), Color.Black);
 
             /*spriteBatch.Draw(buttonTexture, button1, Color.White);
             Vector2 button1TextSize = fpsFont.MeasureString("1");
@@ -164,6 +161,8 @@ namespace rts
             drawSpecialMessages(spriteBatch);
 
             drawGameClock(spriteBatch);
+
+            drawFpsAndPing(spriteBatch);
 
             spriteBatch.End();
 
@@ -1156,6 +1155,19 @@ namespace rts
 
             Vector2 sSize = bigFont.MeasureString(s);
             spriteBatch.DrawString(bigFont, s, new Vector2(minimapSize / 2 - sSize.X / 2, worldViewport.Height - sSize.Y), Color.White);
+        }
+
+        void drawFpsAndPing(SpriteBatch spriteBatch)
+        {
+            // fps message
+            Vector2 fpsMsgSize = fpsFont.MeasureString(fpsMessage);
+            spriteBatch.DrawString(fpsFont, fpsMessage, new Vector2(8, 5), Color.Black);
+
+            // ping message
+            int ping = (int)(CurrentPing * 1000);
+            string pingMsg = " - Ping: " + ping;
+            Vector2 pingMsgSize = fpsFont.MeasureString(pingMsg);
+            spriteBatch.DrawString(fpsFont, pingMsg, new Vector2(8 + fpsMsgSize.X, 5), Color.Black);
         }
 
         void drawSpecialMessages(SpriteBatch spriteBatch)
