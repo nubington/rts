@@ -62,5 +62,18 @@ namespace rts
                 }
             }
         }
+
+        // ignores targeted commands, which is currently only rally point commands
+        public int CountScheduledStructureCommands(Structure structure)
+        {
+            int count = 0;
+            foreach (ScheduledAction action in ScheduledActions)
+            {
+                ScheduledStructureCommand structureCommand = action as ScheduledStructureCommand;
+                if (structureCommand != null && !(structureCommand is ScheduledStructureTargetedCommand) && structureCommand.Structure == structure)
+                    count++;
+            }
+            return count;
+        }
     }
 }

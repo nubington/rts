@@ -464,8 +464,10 @@ namespace rts
 
         public void MoveTowards(Vector2 destination, GameTime gameTime, bool restrictToScreen)
         {
-            lastMove.X = Util.ScaleWithGameTime(speed.X, gameTime);
-            lastMove.Y = Util.ScaleWithGameTime(speed.Y, gameTime);
+            //lastMove.X = Util.ScaleWithGameTime(speed.X, gameTime);
+            //lastMove.Y = Util.ScaleWithGameTime(speed.Y, gameTime);
+
+            float actualSpeed = Util.ScaleWithGameTime(speed.X, gameTime);
 
             Vector2 difference = destination - CenterPoint;
             if (difference == Vector2.Zero)
@@ -476,10 +478,15 @@ namespace rts
                 return;
             }
 
-            float angle = (float)Math.Atan2((double)(destination.Y - CenterPoint.Y), (double)(destination.X - CenterPoint.X));
+            lastMove = new Vector2(destination.X - CenterPoint.X, destination.Y - CenterPoint.Y);
+            lastMove.Normalize();
 
-            lastMove.X *= (float)Math.Cos(angle);
-            lastMove.Y *= (float)Math.Sin(angle);
+            lastMove *= actualSpeed;
+
+            //float angle = (float)Math.Atan2((double)(destination.Y - CenterPoint.Y), (double)(destination.X - CenterPoint.X));
+
+            //lastMove.X *= (float)Math.Cos(angle);
+            //lastMove.Y *= (float)Math.Sin(angle);
 
             PrecisePosition += lastMove;
 
@@ -498,21 +505,34 @@ namespace rts
         // returns true if facing target after turn
         public bool turnTowards(Vector2 target, Vector2 origin, float turnSpeed, GameTime gameTime)
         {
-            float targetAngle = (float)Math.Atan2(target.Y - origin.Y, target.X - origin.X);
+            Vector2 vectorTowardsTarget = target - origin;
+            vectorTowardsTarget.Normalize();
+
+            float targetAngle = (float)Math.Atan2(vectorTowardsTarget.Y, vectorTowardsTarget.X);
+
+            //Vector2 currentDirection = new Vector2((float)Math.Cos(Rotation), (float)Math.Sin(Rotation));
 
             if (Rotation == targetAngle)
                 return true;
-            
-            //float targetX = (float)Math.Cos(targetAngle);
-            //float targetY = (float)Math.Sin(targetAngle);
-
-            Vector3 oldAngleVector = new Vector3((float)Math.Cos(Rotation), (float)Math.Sin(Rotation), 0);
-            //Vector3 newAngleVector = new Vector3(targetX, targetY, 0);
-            Vector3 newAngleVector = new Vector3(target.X - origin.X, target.Y - origin.Y, 0);
-
-            Vector3 crossProduct = Vector3.Cross(oldAngleVector, newAngleVector);
 
             float actualTurnSpeed = Util.ScaleWithGameTime(turnSpeed, gameTime);
+
+            // pretend we are in 3d space operating on the xy-plane
+            // vector a = unit vector of our current direction (z is 0)
+            // vector b = displacement vector from our origin to the target point (z is 0)
+            // a x b will result in a vector orthogonal to a and b, so z will equal something
+            // if z is positive, the angle is between 0 and pi, so increase rotation
+            // if z is negative, the angle is between -pi and 0, so decrease rotation
+
+            // unit vector with our direction
+            Vector3 oldAngleVector = new Vector3((float)Math.Cos(Rotation), (float)Math.Sin(Rotation), 0);
+
+            // displacement vector from origin to target
+            //Vector3 newAngleVector = new Vector3(target.X - origin.X, target.Y - origin.Y, 0);
+            Vector3 newAngleVector = new Vector3(vectorTowardsTarget.X, vectorTowardsTarget.Y, 0);
+
+            // old cross new
+            Vector3 crossProduct = Vector3.Cross(oldAngleVector, newAngleVector);
 
             if (crossProduct.Z > 0)
                 Rotation += actualTurnSpeed;

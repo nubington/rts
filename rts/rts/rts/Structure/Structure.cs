@@ -353,9 +353,12 @@ namespace rts
             if (UnderConstruction)
                 return false;
 
-            if (BuildQueue.Count < MAX_QUEUE_SIZE)
+            // total build queue count including scheduled commands
+            int queueCount = BuildQueue.Count + Player.Me.CountScheduledStructureCommands(this);
+
+            if (queueCount < MAX_QUEUE_SIZE)
             {
-                if (BuildQueue.Count == 1)
+                /*if (queueCount == 1)
                 {
                     BuildUnitButtonType unitButtonType = BuildQueue[0].Type as BuildUnitButtonType;
                     if (unitButtonType != null)
@@ -365,7 +368,7 @@ namespace rts
                         {
                         }
                     }
-                }
+                }*/
 
                 return true;
             }

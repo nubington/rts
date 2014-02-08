@@ -61,10 +61,10 @@
     <XnaCompressContent>true</XnaCompressContent>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>8AD376954B6D946AC299D999BA16E9DBE4176D46</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>E8A5042394F04845B68D6A1CABEB139DADBF8C97</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>rts_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>rts_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -226,6 +226,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="rts_1_TemporaryKey.pfx" />
     <None Include="rts_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

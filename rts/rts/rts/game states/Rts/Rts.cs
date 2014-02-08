@@ -15,8 +15,8 @@ namespace rts
 {
     public partial class Rts : GameState
     {
-        public static float GameSpeed = 2.5f;
-        public static float MusicVolume = 0f;//.2f;
+        public static float GameSpeed = 1f;//2.5f;
+        public static float MusicVolume = .2f;
         public const float COUNTDOWN_TIME = 10f;
 
         public static GameTime gameTime;

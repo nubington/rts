@@ -804,8 +804,9 @@ namespace rts
             //float moveX = Util.ScaleWithGameTime(speed.X, gameTime);
             //float moveY = Util.ScaleWithGameTime(speed.Y, gameTime);
             Speed = MathHelper.Min(Speed + Util.ScaleWithGameTime(acceleration, gameTime), MaxSpeed);
-            float moveX = Util.ScaleWithGameTime(Speed, gameTime);
-            float moveY = moveX;
+            float actualSpeed = Util.ScaleWithGameTime(Speed, gameTime);
+            //float moveX = Util.ScaleWithGameTime(Speed, gameTime);
+            //float moveY = moveX;
 
             if (command.WayPoints.Count > 1)
             {
@@ -818,8 +819,9 @@ namespace rts
             }
             else
             {
-                Vector2 difference = wayPoint - centerPoint;
-                if (Math.Abs(difference.X) < moveX && Math.Abs(difference.Y) < moveY)
+                //Vector2 difference = wayPoint - centerPoint;
+                float distance = Vector2.Distance(wayPoint, centerPoint);
+                if (distance < actualSpeed)
                 {
                     this.CenterPoint = wayPoint;
                     HasMoved = true;
@@ -832,12 +834,20 @@ namespace rts
                 }
             }
 
-            float angle = (float)Math.Atan2(wayPoint.Y - CenterPoint.Y, wayPoint.X - CenterPoint.X);
-            moveX *= (float)Math.Cos(angle);
-            moveY *= (float)Math.Sin(angle);
+            //float angle = (float)Math.Atan2(wayPoint.Y - CenterPoint.Y, wayPoint.X - CenterPoint.X);
+            //moveX *= (float)Math.Cos(angle);
+            //moveY *= (float)Math.Sin(angle);
 
-            lastMove.X = moveX;
-            lastMove.Y = moveY;
+            //lastMove.X = moveX;
+            //lastMove.Y = moveY;
+
+            lastMove = new Vector2(wayPoint.X - CenterPoint.X, wayPoint.Y - CenterPoint.Y);
+            //lastMove.Normalize();
+
+            //lastMove *= actualSpeed;
+
+            lastMove *= (actualSpeed / lastMove.Length());
+
             PrecisePosition += lastMove;
             HasMoved = true;
 

@@ -62,6 +62,8 @@ namespace rts
 
             ColorTexture.Initialize(GraphicsDevice);
 
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
             //CurrentGameState = new Rts(RtsEventHandler);
             CurrentGameState = new StartMenu(StartMenuEventHandler);
 
@@ -69,7 +71,6 @@ namespace rts
         }
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
         protected override void UnloadContent()

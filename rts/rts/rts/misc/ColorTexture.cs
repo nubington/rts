@@ -3,6 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace rts
 {
+    /// <summary>
+    /// call initialize function at start of game
+    /// </summary>
     public class ColorTexture
     {
 

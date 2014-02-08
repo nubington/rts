@@ -624,15 +624,17 @@ namespace rts
 
         void giveStructureCommand(BuildUnitButtonType buttonType)
         {
+            // error if not enough roks
             if (buttonType.UnitType.RoksCost > Player.Me.Roks)
             {
                 playErrorSound();
                 return;
             }
 
+            // find selected structure with smallest queue
+            // also counts scheduled commands
             Structure structureWithSmallestQueue = null;
             int smallest = int.MaxValue;
-
             foreach (RtsObject o in SelectedUnits)
             {
                 Structure s = o as Structure;
@@ -642,14 +644,16 @@ namespace rts
 
                 if (s != null && s.Type == SelectedUnits.ActiveType && !s.UnderConstruction)
                 {
-                    if (s.BuildQueue.Count < smallest)
+                    int queueCount = s.BuildQueue.Count + Player.Me.CountScheduledStructureCommands(s);
+                    if (queueCount < smallest)
                     {
                         structureWithSmallestQueue = s;
-                        smallest = s.BuildQueue.Count;
+                        smallest = queueCount;
                     }
                 }
             }
 
+            // find structure with highest percent done (and smallest queue)
             float highestPercentDone = 0;
             foreach (RtsObject o in SelectedUnits)
             {
@@ -671,6 +675,7 @@ namespace rts
                 }
             }
 
+            // give command to the structure
             if (structureWithSmallestQueue != null)
             {
                 //if (structureWithSmallestQueue.AddToBuildQueue(buttonType))
